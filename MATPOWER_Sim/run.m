@@ -14,7 +14,7 @@ clear;
 topology = 'case39';
 iterations = 1000;
 %initialFailures = 2;
-loadGenerationRatio = .8; %reduce R
+loadGenerationRatio = .9; %reduce R
 loadShedConstant = .7;
 capacityEstimationError = .05;
 min_num_lines = 2;
@@ -59,7 +59,7 @@ end
 % [States, Initial_Failure_Table]=S_FindingStateSpace_ANN_dataset_function(topology, iterations, initialFailures, loadGenerationRatio, loadShedConstant, capacityEstimationError);
 % save('states_Polish.mat', 'States')
 % save('initial_failures_Polish.mat', 'Initial_Failure_Table')
-%ACTIVSg200
+%ACTIVSg2000
 % clear;
 % topology = 'ACTIVSg2000';
 % iterations = 10;
