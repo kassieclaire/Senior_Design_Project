@@ -15,6 +15,7 @@ import matplotlib.tri as tri
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import collections, colors, transforms
+from p_stop_curve import cascading_failure_function
 # plt.xkcd()  # XKCD-like ploting.
 
 BODY = """
@@ -31,7 +32,7 @@ BODY = """
 """
 
 HEAD = """
-<title>MatPlotLib with the Atlas Toolkit</title>
+<title>GUI P-Stop Test</title>
 <style>
   fieldset {margin: auto; text-align: center;}
   #Buttons {display: none;}
@@ -42,7 +43,7 @@ HEAD = """
 </style>
 """
 
-AMOUNT = 10
+AMOUNT = 1
 
 def getSVG(plt):
   figfile = StringIO()
@@ -55,8 +56,23 @@ def getSVG(plt):
   return svg
 
 def run(example):
-  return eval(f"example{example}()")
-
+  #return eval(f"example{example}()")
+  return eval(f"plot_p_stop()")
+def plot_p_stop():
+  p_stop_df = cascading_failure_function()
+  fig = plt.figure()
+  plt.plot('x_values', 'cascade_stop', data=p_stop_df, color='skyblue', linewidth=1)
+  plt.xlabel('Number of Failed Lines')
+  plt.ylabel('Cascade-Stop Probability')
+  plt.title('Cascade-Stop Probability vs Number of Line Failures')
+  # show legend
+  plt.legend()
+  #set title
+  plt.title = "Cascade-Stop Probability vs Number of Line Failures"
+  # show graph
+  #     plt.show()
+  #return SVG
+  return getSVG(plt)
 def example1():
   labels = ['G1', 'G2', 'G3', 'G4', 'G5']
   men_means = [20, 34, 30, 35, 27]
