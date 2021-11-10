@@ -35,10 +35,23 @@ def draw_figure(canvas, figure):
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
     return figure_canvas_agg
 
+# layout = [[sg.Text('Plot test')],
+#           [sg.Text('Load: '), sg.InputText(), sg.Canvas(key='-CANVAS-')],
+#           [sg.Text('Line Failures: '), sg.InputText()],
+#           [sg.Text('Load Shed Control: '), sg.InputText()],
+#           [sg.Text('Cap Est. Err.: '), sg.InputText()],
+#           [sg.Button('Run'), sg.Button('More Options')],
+#           [sg.Button('Cancel')]]
+#create column
+#fill in column
+input_column = [[sg.Text('Load: '), sg.InputText()],
+                [sg.Text('Line Failures: '), sg.InputText()],
+                [sg.Text('Load Shed Control: '), sg.InputText()],
+                [sg.Text('Cap Est. Err.: '), sg.InputText()],
+                [sg.Button('Run'), sg.Button('More Options')],
+                [sg.Button('Cancel')]]
 layout = [[sg.Text('Plot test')],
-          [sg.Canvas(key='-CANVAS-')],
-          [sg.Button('Ok')]]
-
+          [sg.Column(input_column, element_justification='c'), sg.Canvas(key='-CANVAS-')]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI', layout, finalize=True, element_justification='center', font='Helvetica 18')
 
