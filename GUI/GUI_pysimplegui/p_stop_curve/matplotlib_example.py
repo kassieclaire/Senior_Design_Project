@@ -4,6 +4,9 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import PySimpleGUI as sg
 import matplotlib
+import os
+from PIL import Image, ImageTk
+from urllib import request
 matplotlib.use('TkAgg')
 from p_stop_curve import cascading_failure_function
 """
@@ -49,29 +52,37 @@ def draw_figure(canvas, figure):
 #           [sg.Button('Cancel')]]
 #create column
 #fill in column
-input_column = [[sg.Text('Load')],
-                [sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)],
-                [sg.Text('Initial Line Failures: ')],
-                [sg.Slider(orientation ='horizontal', key='stSlider', range=(1,num_lines), resolution=1)],
-                [sg.Text('Load Shed Control')],
-                [sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)],
-                [sg.Text('Cap Est. Err.')],
-                [sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)],
-                [sg.Button('More Options'), sg.Button('Run')],
+description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
+load_tooltip = "This is the load-generation ratio for the grid. \n" + \
+    "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
+    "and 0.0 represents no load"
+input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
+                [sg.Frame('Load', [[sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01, tooltip=load_tooltip)]], border_width=10)],
+                [sg.Frame('Initial Line Failures', [[sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)]], border_width=10)],
+                [sg.Frame('Flexibility', [[sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)]], border_width=10)],
+                [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)]], border_width=10)],
+                [sg.Button('More Options'), sg.Button('Run')]
                 ]
-output_column = [[sg.Canvas(key='-CANVAS-')],
+filename = os.getcwd() + "/graph_png.png"
+# Resize PNG file to size (300, 300)
+#size = (300, 300)
+# im = Image.open(filename)
+# im = im.resize(size, resample=Image.BICUBIC)
+# image = ImageTk.PhotoImage(image=im)
+#output_column = [[sg.Canvas(key='-CANVAS-')],
+output_column = [[sg.Image(filename=filename)],
                 [sg.Text('Loss of Delivery Capacity: '), sg.Text(str(delivery_loss_percent) + "%")],
                 [sg.Text('Max Line Capacity: '), sg.Text(str(cap_loss) + " MW")],
                 [sg.Text('Worst-off Cluster: '), sg.Text(str(worst_cluster))],
                 [sg.Text('Probability of failure: '), sg.Text('Click on Line')],
                 ]
-layout = [[sg.Text('Cascading failure sim')],
+layout = [[sg.Text('Cascading failure Simulator GUI')],
           [sg.Column(input_column, element_justification='c'), sg.Column(output_column, element_justification='c')]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI', layout, finalize=True, element_justification='center', font='Helvetica 18')
 
 # add the plot to the window
-fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, draw_plot())
+#fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, draw_plot())
 
 event, values = window.read()
 
