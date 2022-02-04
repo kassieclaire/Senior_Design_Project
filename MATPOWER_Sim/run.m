@@ -10,15 +10,17 @@
 % save('states_IEEE118.mat', 'States')
 % save('initial_failures_IEEE118.mat', 'Initial_Failure_Table')
 %%IEEE39_2
+function run()
+
 clear;
-topology = 'case39';
-iterations = 1000;
+topology = 'case300';
+iterations = 100;
 %initialFailures = 2;
-loadGenerationRatio = .9; %reduce R
-loadShedConstant = .7;
-capacityEstimationError = .05;
+loadGenerationRatio = .7; %reduce R
+loadShedConstant = .1;
+capacityEstimationError = .2;
 min_num_lines = 2;
-max_num_lines = 5;
+max_num_lines = 2;
 for k=min_num_lines:max_num_lines
     initialFailures = k;
     run_name = append(topology, '_', 'initial_failures_count_', string(k));
