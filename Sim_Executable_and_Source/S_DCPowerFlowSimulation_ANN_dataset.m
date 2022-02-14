@@ -1,6 +1,7 @@
 %Made into function by Kassie Povinelli
 function States = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)
-
+%edit so that it outputs mpc data as well
+%here's an example: function [States, resulting_mpc]
     
     %%  Human error probability
     
@@ -235,6 +236,7 @@ function States = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  %%
             moreFailures=1; % Is any failure happened in previous step?
             counter =0;
+            %failure loop starts here
             while(moreFailures)
                 moreFailures=0; % to see we will have more failures or not
                 %%%%%%%%%%%%%%% Find the connected components%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -334,4 +336,5 @@ function States = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, 
         
                 end % end of saving the states
             end
+    %result_mpc = mpc1 %output the mpc -- matpower grid structure
 end

@@ -22,7 +22,7 @@ worst_cluster = 4
 num_lines = 186
 #end defines
 def draw_plot():
-    p_stop_df = cascading_failure_function()
+    p_stop_df = cascading_failure_function() #
     fig = plt.figure()
     plt.plot('x_values', 'cascade_stop', data=p_stop_df, color='skyblue', linewidth=1)
     plt.xlabel('Number of Failed Lines')
@@ -63,7 +63,7 @@ input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation ='horizontal', key='stSlider', range=(0.0,1.0), resolution=.01)]], border_width=10)],
                 [sg.Button('More Options'), sg.Button('Run')]
                 ]
-filename = os.getcwd() + "/graph_png.png"
+filename = os.getcwd() + "/graph_png.png" #TODO: get rid of this, make it display the pstop instead
 # Resize PNG file to size (300, 300)
 #size = (300, 300)
 # im = Image.open(filename)

@@ -163,6 +163,8 @@ if (NumIt > simulation_group_size)
             %AC code
             while (success == 0)
                 StatesCell(s, 1) = {S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
+                %[StatesCell(s, 1), resulting_mpc] -- change at lines 165 AND 213(ish)
+                %{StatesCell(s, 1), mpc_cell(s, 1)}
                 States_Matrix = StatesCell{s, 1};
                 if States_Matrix(1,1) ~= -2
                     success = 1;
@@ -220,6 +222,7 @@ else
     end
     %Temporary -- turn states cell array back to array
     States = cell2mat(StatesCell); %Turn cells to states matrix
+    %output mpc_cell
 end
 if failure_track > 0
     fprintf("%d iterations of simulation required restart. \n", failure_track);
