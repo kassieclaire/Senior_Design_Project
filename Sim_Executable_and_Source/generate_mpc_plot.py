@@ -4,6 +4,7 @@ from pandapower.plotting import cmap_continuous, create_bus_trace, draw_traces
 from pandapower.plotting import cmap_discrete, create_line_trace, draw_traces
 import pandapower.plotting
 import pandapower.converter
+import pandapower.networks
 import pandapower
 
 
@@ -16,6 +17,7 @@ import pandapower
 
 MPC_PATH = '.\\Sim_Executable_and_Source\\mpc_case118_2.mat'
 mpc = pandapower.converter.from_mpc(MPC_PATH)
+# mpc = pandapower.networks.case118()
 
 print(mpc)
 print(type(mpc))
@@ -41,7 +43,8 @@ cmap, norm = cmap_continuous(cmap_list)
 # draw_traces(bc)
 
 # collection based plotting
-pandapower.plotting.create_generic_coordinates(mpc)
+if len(mpc.line_geodata) == 0 and len(mpc.bus_geodata) == 0:
+    pandapower.plotting.create_generic_coordinates(mpc)
 pandapower.plotting.create_gen_collection
 cmap_list = [(0.97, "blue"), (1.0, "green"), (1.03, "red")]
 cmap, norm = cmap_continuous(cmap_list)
@@ -88,8 +91,12 @@ switch_size = sizes["switch"]
 switch_distance = sizes["switch_distance"]
 gen_size = sizes["gen"]
 # create bus collections to plot
+cmap_list = [((0.0, 200), "blue"), ((200, 500), "yellow")]
+cmap, norm = cmap_discrete(cmap_list)
+# bc = pandapower.plotting.create_bus_collection(
+#     mpc, mpc.bus.index, size=bus_size, color="b", zorder=10)
 bc = pandapower.plotting.create_bus_collection(
-    mpc, mpc.bus.index, size=bus_size, color="b", zorder=10)
+    mpc, mpc.bus.index, size=bus_size, color="b", cmap=cmap, norm=norm, z=mpc.bus['vn_kv'])
 # if bus geodata is available, but no line geodata
 use_bus_geodata = len(mpc.line_geodata) == 0
 in_service_lines = mpc.line[mpc.line.in_service].index
