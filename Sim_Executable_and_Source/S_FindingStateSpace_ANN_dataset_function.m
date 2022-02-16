@@ -1,4 +1,4 @@
-function [States, IniFtable] = S_FindingStateSpace_ANN_dataset_function(CaseName, Iterations, InitialFailures, LoadGenerationRatio, LoadShedConstant, EstimationError, batch_size) %Add initial_failure_cluster variable, set by default to -1
+function [States, IniFtable, mpc_cell] = S_FindingStateSpace_ANN_dataset_function(CaseName, Iterations, InitialFailures, LoadGenerationRatio, LoadShedConstant, EstimationError, batch_size) %Add initial_failure_cluster variable, set by default to -1
 %Function that returns a state space for (Topology, # of iterations, # of initial failures, load-generation ratio (r), LoadShedConstant (\theta), and capcacity estimation error (e))
 %clc;
 %clear all;
@@ -84,7 +84,7 @@ for i=1:NumIt
     %2 or 3 failures
     % b=1+ceil(9*rand);
     %if initial_failure_cluster != -1
-        %then use initial failures only from cluster
+    %then use initial failures only from cluster
     %end
     %else
     %do this
@@ -153,6 +153,7 @@ if (NumIt > simulation_group_size)
         %start the group of simulations in parallel
         fprintf("Starting simulations from starting index %d to ending index %d\n\r", start_index, end_index);
         StatesCell = cellmat((end_index-start_index+1), 1, 10000, 14);
+        mpc_cell = cell(end_index-start_index+1, 1);
         final_index = (end_index-start_index+1);
         parfor s=1:final_index % for every iteration under the same setting
             %s %print out s
@@ -162,7 +163,10 @@ if (NumIt > simulation_group_size)
             %StatesCell(s, 1) = {DCPowerFlowSimulation(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
             %AC code
             while (success == 0)
-                StatesCell(s, 1) = {S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
+                [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
+                StatesCell(s, 1) = {States};
+                mpc_cell(s) = {resulting_mpc};
+                % [StatesCell(s, 1), mpc_cell(s, 1)] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 %[StatesCell(s, 1), resulting_mpc] -- change at lines 165 AND 213(ish)
                 %{StatesCell(s, 1), mpc_cell(s, 1)}
                 States_Matrix = StatesCell{s, 1};
@@ -200,7 +204,7 @@ if (NumIt > simulation_group_size)
         group_name = strcat("temp_", num2str(k), ".mat");
         delete(group_name);
     end
-
+    
 else
     StatesCell = cellmat(NumIt, 1, 1000, 14);
     parfor s=1:NumIt % for every iteration under the same setting
@@ -227,7 +231,7 @@ end
 if failure_track > 0
     fprintf("%d iterations of simulation required restart. \n", failure_track);
 end
-   %
+%
 
 toc
 end

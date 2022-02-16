@@ -1,0 +1,7 @@
+Number of iterations exceeds amount allowed for single group. Splitting into 157 simulations of max size 64
+Starting simulations from starting index 1 to ending index 64
+Starting parallel pool (parpool) using the 'local' profile ...
+Connected to the parallel pool (number of workers: 4).
+Starting simulations from starting index 65 to ending index 128
+Starting simulations from starting index 129 to ending index 192
+

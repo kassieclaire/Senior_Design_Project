@@ -19,7 +19,7 @@ loadGenerationRatio = .8; %reduce R
 loadShedConstant = .7;
 capacityEstimationError = .05;
 %for k=1:40
-for k=10:10
+for k=1:1
     initialFailures = k;
     run_name = append(topology, '_', 'initial_failures_count_', string(k));
     [States, Initial_Failure_Table, mpc_cell]=S_FindingStateSpace_ANN_dataset_function(topology, iterations, initialFailures, loadGenerationRatio, loadShedConstant, capacityEstimationError, 10);
@@ -37,9 +37,9 @@ for k=10:10
     
 end
 
-for k = 1:10
-    mpc = mpc_cell{k};
-    save(sprintf("mpc_%s_%d", topology, k), 'mpc') 
+for k = 1:20
+    mpc = mpc_cell{k}
+    save(sprintf(mpc_%d_
 end
 
 %%IEEE300
