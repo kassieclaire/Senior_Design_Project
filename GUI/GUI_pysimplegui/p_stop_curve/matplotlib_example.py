@@ -111,14 +111,14 @@ input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)
                     0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
                 [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), orientation='horizontal',
                           key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
-                [sg.Frame('Flexibility', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
+                [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
                     0.0, 1.0), resolution=.05)]], border_width=10)],
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                           key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), resolution=0.05)]], border_width=10)],
                 [sg.Button('More Options'), sg.Button('Run')]
                 ]
 # TODO: get rid of this, make it display the pstop instead
-filename = os.getcwd() + "/graph_png.png"
+#filename = os.getcwd() + "/graph_png.png"
 # Resize PNG file to size (300, 300)
 #size = (300, 300)
 # im = Image.open(filename)
@@ -152,12 +152,12 @@ while True:
     if event == 'Run':
         print('the "run" button has been pressed!')
         case_name = 'case118'
-        iterations = 10
+        iterations = 100
         initial_failures = 2
         load_generation_ratio = 0.7
         load_shed_constant = 0.1
         estimation_error = 0.1
-        batch_size = 5
+        batch_size = 16
         load_generation_ratio = values[SLIDER_LOAD]
         initial_failures = int(values[SLIDER_INITIAL_FAILURES])
         load_shed_constant = values[SLIDER_LOAD_SHED_CONST]
