@@ -115,7 +115,7 @@ initial_failures_tooltip = "This is the number of random line failures that occu
 input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                 [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
                     0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=operator_constraints_tooltip, orientation='horizontal',
+                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
                           key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
                 [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
                     0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
