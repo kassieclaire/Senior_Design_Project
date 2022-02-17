@@ -106,15 +106,21 @@ description = " This is a Graphical User Interface \n for the SACE lab's cascadi
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
     "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
     "and 0.0 represents no load"
+operator_constraints_tooltip = "This represents the constraints to which grid operators are held when making load-shedding decisions. \n" + \
+    "0.0 represents no load-shedding constraints, while 1.0 represents no load-shedding allowed"
+error_tooltip = "This represents the estimation error operators have when determining the highest capacity of a line. \n" + \
+    "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
+initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
+
 input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                 [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
                     0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), orientation='horizontal',
+                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=operator_constraints_tooltip, orientation='horizontal',
                           key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
                 [sg.Frame('Flexibility', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
-                    0.0, 1.0), resolution=.05)]], border_width=10)],
+                    0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
-                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), resolution=0.05)]], border_width=10)],
+                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip = error_tooltip, resolution=0.05)]], border_width=10)],
                 [sg.Button('More Options'), sg.Button('Run')]
                 ]
 # TODO: get rid of this, make it display the pstop instead
