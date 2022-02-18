@@ -181,7 +181,7 @@ while True:
     if event == 'Run':
         print('the "run" button has been pressed!')
         case_name = 'case118'
-        iterations = 100
+        iterations = 10000
         initial_failures = 2
         load_generation_ratio = 0.7
         load_shed_constant = 0.1
