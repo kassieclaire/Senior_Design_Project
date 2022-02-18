@@ -211,6 +211,7 @@ while True:
         #make more options visible
         window[COLUMN_INPUT_S].Update(visible=True)
         window[COLUMN_OUTPUT_S].Update(visible=True)
+        fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
         window.refresh()
     # TODO add a proper event for windows closed (event == WIN_CLOSED)?
     elif event == sg.WIN_CLOSED:
