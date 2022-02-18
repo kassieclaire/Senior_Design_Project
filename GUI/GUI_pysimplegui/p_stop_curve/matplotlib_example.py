@@ -169,8 +169,7 @@ output_column_s = [[sg.Canvas(key='-CANVAS-')],
                  [sg.Text('Probability of failure: '),
                   sg.Text('Click on Line')],
                  ]
-layout_s = [[sg.Text('Cascading failure Simulator GUI')],
-          [sg.Column(input_column_s, element_justification='c'), sg.Column(output_column_s, element_justification='c')]]
+
 layout = [[sg.Text('Cascading failure Simulator GUI')],
           [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c'),
            sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False), sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False)]]
