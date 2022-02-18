@@ -17,6 +17,10 @@ SLIDER_INITIAL_FAILURES = 'slider_init_failures'
 SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
 SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
 
+#column names (input and output) (used as keys)
+COLUMN_INPUT = 'input_column'
+COLUMN_OUTPUT  = 'output_column'
+
 matplotlib.use('TkAgg')
 """
     Simultaneous PySimpleGUI Window AND a Matplotlib Interactive Window
@@ -141,7 +145,7 @@ output_column = [[sg.Canvas(key='-CANVAS-')],
                   sg.Text('Click on Line')],
                  ]
 layout = [[sg.Text('Cascading failure Simulator GUI')],
-          [sg.Column(input_column, element_justification='c'), sg.Column(output_column, element_justification='c')]]
+          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c')]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
                    layout, finalize=True, element_justification='center', font='Helvetica 18')
@@ -151,7 +155,7 @@ input_column_s = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(descriptio
                     0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
                 [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
                           key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
-                [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
+                [sg.Frame('Operator Constraints (TEST)', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
                     0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                           key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip = error_tooltip, resolution=0.05)]], border_width=10)],
@@ -198,8 +202,8 @@ while True:
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
     elif event == 'More Options':
-        window.Update('More Options',
-                   layout_s, finalize=True, element_justification='center', font='Helvetica 18')
+        window[COLUMN_INPUT].Update(values=input_column_s)
+        window.refresh()
     # TODO add a proper event for windows closed (event == WIN_CLOSED)?
     elif event == sg.WIN_CLOSED:
         break
