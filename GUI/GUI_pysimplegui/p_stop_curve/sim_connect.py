@@ -30,16 +30,16 @@ def __get_fraction(num):
     return str(num).split('.')[1]
 
 
-def get_output_name(case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error):
+def get_output_name(case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations):
     output_name = f"{case_name}_{initial_failures}_{__get_fraction(load_generation_ratio)}_" + \
-        f"{__get_fraction(load_shed_constant)}_{__get_fraction(estimation_error)}"
+        f"{__get_fraction(load_shed_constant)}_{__get_fraction(estimation_error)}_{iterations}"
     return output_name
 
 
 def run_simulation(case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size, output_name=None):
     if output_name is None:
         output_name = get_output_name(
-            case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error)
+            case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
     arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
     print(arguments)
     os.system(f"{executable} {arguments}")
