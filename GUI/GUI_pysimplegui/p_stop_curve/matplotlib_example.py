@@ -198,7 +198,7 @@ while True:
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
     elif event == 'More Options':
-        window = sg.Window('More Options',
+        window.Update('More Options',
                    layout_s, finalize=True, element_justification='center', font='Helvetica 18')
     # TODO add a proper event for windows closed (event == WIN_CLOSED)?
     elif event == sg.WIN_CLOSED:
