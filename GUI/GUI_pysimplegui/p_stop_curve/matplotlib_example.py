@@ -20,6 +20,8 @@ SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
 #column names (input and output) (used as keys)
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT  = 'output_column'
+COLUMN_INPUT_S = 'input_column_s'
+COLUMN_OUTPUT_S  = 'output_column_s'
 
 matplotlib.use('TkAgg')
 """
@@ -144,11 +146,7 @@ output_column = [[sg.Canvas(key='-CANVAS-')],
                  [sg.Text('Probability of failure: '),
                   sg.Text('Click on Line')],
                  ]
-layout = [[sg.Text('Cascading failure Simulator GUI')],
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c')]]
-# create the form and show it without the plot
-window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                   layout, finalize=True, element_justification='center', font='Helvetica 18')
+
 #Create layout for more input options/better outputs (more options)
 input_column_s = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                 [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
@@ -173,6 +171,12 @@ output_column_s = [[sg.Canvas(key='-CANVAS-')],
                  ]
 layout_s = [[sg.Text('Cascading failure Simulator GUI')],
           [sg.Column(input_column_s, element_justification='c'), sg.Column(output_column_s, element_justification='c')]]
+layout = [[sg.Text('Cascading failure Simulator GUI')],
+          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c'),
+           sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False), sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False)]]
+# create the form and show it without the plot
+window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
+                   layout, finalize=True, element_justification='center', font='Helvetica 18')
 # add the plot to the window
 fig = draw_plot()
 fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
@@ -202,7 +206,12 @@ while True:
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
     elif event == 'More Options':
-        window[COLUMN_INPUT].Update(values=input_column_s)
+        #make non-special columns invisible
+        window[COLUMN_INPUT].Update(visible=False)
+        window[COLUMN_OUTPUT].Update(visible=False)
+        #make more options visible
+        window[COLUMN_INPUT_S].Update(visible=True)
+        window[COLUMN_OUTPUT_S].Update(visible=True)
         window.refresh()
     # TODO add a proper event for windows closed (event == WIN_CLOSED)?
     elif event == sg.WIN_CLOSED:
