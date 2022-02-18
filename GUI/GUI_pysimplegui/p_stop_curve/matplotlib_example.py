@@ -172,7 +172,7 @@ output_column_s = [[sg.Canvas(key='-CANVAS-')],
 
 layout = [[sg.Text('Cascading failure Simulator GUI')],
           [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c'),
-           sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False), sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False)]]
+           sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False), sg.pin(sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False))]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
                    layout, finalize=True, element_justification='center', font='Helvetica 18')
