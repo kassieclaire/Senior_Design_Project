@@ -145,7 +145,30 @@ layout = [[sg.Text('Cascading failure Simulator GUI')],
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
                    layout, finalize=True, element_justification='center', font='Helvetica 18')
-
+#Create layout for more input options/better outputs (more options)
+input_column_s = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
+                [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
+                    0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
+                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
+                          key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
+                [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
+                    0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
+                [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
+                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip = error_tooltip, resolution=0.05)]], border_width=10)],
+                [sg.Button('More Options'), sg.Button('Run')]
+                ]
+output_column_s = [[sg.Canvas(key='-CANVAS-')],
+                 # output_column = [[sg.Image(filename=filename)],
+                 [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+                     str(delivery_loss_percent) + "%")],
+                 [sg.Text('Max Line Capacity: '),
+                  sg.Text(str(cap_loss) + " MW")],
+                 [sg.Text('Worst-off Cluster: '), sg.Text(str(worst_cluster))],
+                 [sg.Text('Probability of failure: '),
+                  sg.Text('Click on Line')],
+                 ]
+layout_s = [[sg.Text('Cascading failure Simulator GUI')],
+          [sg.Column(input_column_s, element_justification='c'), sg.Column(output_column_s, element_justification='c')]]
 # add the plot to the window
 fig = draw_plot()
 fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
@@ -174,6 +197,9 @@ while True:
                                 load_generation_ratio, load_shed_constant, estimation_error, batch_size)
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
+    elif event == 'More Options':
+        window = sg.Window('More Options',
+                   layout_s, finalize=True, element_justification='center', font='Helvetica 18')
     # TODO add a proper event for windows closed (event == WIN_CLOSED)?
     elif event == sg.WIN_CLOSED:
         break
