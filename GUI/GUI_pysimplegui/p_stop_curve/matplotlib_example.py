@@ -62,7 +62,7 @@ def run_button_action(fig, case_name, iterations, initial_failures, load_generat
     """
     # step 1: get the name
     name = sim_connect.get_output_name(
-        case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error)
+        case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
     # if the simulation has not been run with the current settings, run the simulation
     if not os.path.exists(name + "_sm.mat"):
         print("Simulation with current settings has not been run, running simulation.")
@@ -188,7 +188,7 @@ while True:
     if event == 'Run':
         print('the "run" button has been pressed!')
         case_name = 'case118'
-        iterations = 10000
+        iterations = 100000 #TODO: Make this an input
         initial_failures = 2
         load_generation_ratio = 0.7
         load_shed_constant = 0.1
