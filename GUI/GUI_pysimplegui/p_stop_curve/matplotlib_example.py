@@ -17,11 +17,11 @@ SLIDER_INITIAL_FAILURES = 'slider_init_failures'
 SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
 SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
 
-#column names (input and output) (used as keys)
+# column names (input and output) (used as keys)
 COLUMN_INPUT = 'input_column'
-COLUMN_OUTPUT  = 'output_column'
+COLUMN_OUTPUT = 'output_column'
 COLUMN_INPUT_S = 'input_column_s'
-COLUMN_OUTPUT_S  = 'output_column_s'
+COLUMN_OUTPUT_S = 'output_column_s'
 
 matplotlib.use('TkAgg')
 """
@@ -118,15 +118,17 @@ error_tooltip = "This represents the estimation error operators have when determ
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
 initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
 
+sg.theme('LightGrey1')
+
 input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                 [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
                     0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
                 [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
                           key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
                 [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
-                    0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
+                    0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
-                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip = error_tooltip, resolution=0.05)]], border_width=10)],
+                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
                 [sg.Button('More Options'), sg.Button('Run')]
                 ]
 # TODO: get rid of this, make it display the pstop instead
@@ -147,32 +149,33 @@ output_column = [[sg.Canvas(key='-CANVAS-')],
                   sg.Text('Click on Line')],
                  ]
 
-#Create layout for more input options/better outputs (more options)
+# Create layout for more input options/better outputs (more options)
 input_column_s = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
-                    0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
-                          key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
-                [sg.Frame('Operator Constraints (TEST)', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
-                    0.0, 1.0), tooltip = operator_constraints_tooltip, resolution=.05)]], border_width=10)],
-                [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
-                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip = error_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Button('More Options'), sg.Button('Run')]
-                ]
+                  [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
+                      0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
+                  [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
+                                                                 key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
+                  [sg.Frame('Operator Constraints (TEST)', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
+                      0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
+                  [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
+                                                                     key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
+                  [sg.Button('More Options'), sg.Button('Run')]
+                  ]
 output_column_s = [[sg.Canvas(key='-CANVAS-')],
-                 # output_column = [[sg.Image(filename=filename)],
-                 [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                     str(delivery_loss_percent) + "%")],
-                 [sg.Text('Max Line Capacity: '),
-                  sg.Text(str(cap_loss) + " MW")],
-                 [sg.Text('Worst-off Cluster: '), sg.Text(str(worst_cluster))],
-                 [sg.Text('Probability of failure: '),
-                  sg.Text('Click on Line')],
-                 ]
+                   # output_column = [[sg.Image(filename=filename)],
+                   [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+                       str(delivery_loss_percent) + "%")],
+                   [sg.Text('Max Line Capacity: '),
+                    sg.Text(str(cap_loss) + " MW")],
+                   [sg.Text('Worst-off Cluster: '),
+                    sg.Text(str(worst_cluster))],
+                   [sg.Text('Probability of failure: '),
+                    sg.Text('Click on Line')],
+                   ]
 
 layout = [[sg.Text('Cascading failure Simulator GUI')],
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c'),
-           sg.pin(sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False)), sg.pin(sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False))]]
+          [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c'),
+           sg.pin(sg.Column(input_column_s, key=COLUMN_INPUT_S, element_justification='c', visible=False)), sg.pin(sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible=False))]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
                    layout, finalize=True, element_justification='center', font='Helvetica 18')
@@ -188,7 +191,7 @@ while True:
     if event == 'Run':
         print('the "run" button has been pressed!')
         case_name = 'case118'
-        iterations = 100000 #TODO: Make this an input
+        iterations = 100000  # TODO: Make this an input
         initial_failures = 2
         load_generation_ratio = 0.7
         load_shed_constant = 0.1
@@ -205,10 +208,10 @@ while True:
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
     elif event == 'More Options':
-        #make non-special columns invisible
+        # make non-special columns invisible
         window[COLUMN_INPUT].Update(visible=False)
         window[COLUMN_OUTPUT].Update(visible=False)
-        #make more options visible
+        # make more options visible
         window[COLUMN_INPUT_S].Update(visible=True)
         window[COLUMN_OUTPUT_S].Update(visible=True)
         fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
