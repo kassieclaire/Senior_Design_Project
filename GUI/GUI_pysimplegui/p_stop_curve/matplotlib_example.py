@@ -207,6 +207,7 @@ while True:
                                 load_generation_ratio, load_shed_constant, estimation_error, batch_size)
         # draw_figure(window['-CANVAS-'].TKCanvas, fig)
         fig.canvas.draw()
+    #TODO: Update layout to "more options" design, get it its own graph
     elif event == 'More Options':
         # make non-special columns invisible
         window[COLUMN_INPUT].Update(visible=False)
