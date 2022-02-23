@@ -31,8 +31,8 @@ def __get_fraction(num):
 
 
 def get_output_name(case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations):
-    output_name = f"{case_name}_{initial_failures}_{__get_fraction(load_generation_ratio)}_" + \
-        f"{__get_fraction(load_shed_constant)}_{__get_fraction(estimation_error)}_{iterations}"
+    output_name = f"{case_name}_f{initial_failures}_r{__get_fraction(load_generation_ratio)}_t" + \
+        f"{__get_fraction(load_shed_constant)}_e{__get_fraction(estimation_error)}_i{iterations}"
     return output_name
 
 
