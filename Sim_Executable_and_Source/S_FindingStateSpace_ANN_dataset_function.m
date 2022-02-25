@@ -101,6 +101,10 @@ for i=1:NumIt
 end
 %%
 mpc1 = OriginalMPC; % this is the MPC with separated load and generator
+%save the original mpc
+mpc = mpc1;
+save(CaseName + "_presim", "mpc")
+
 BranchMatrix=mpc1.branch;
 NumBranches=length(BranchMatrix(:,1));
 BusMatrix=mpc1.bus;
