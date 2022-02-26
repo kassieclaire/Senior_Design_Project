@@ -2,7 +2,8 @@ import os
 import sys
 from unittest import case
 # defines
-executable = ".\\sim_executable\\cascading_failure_simulator.exe"
+windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
+mac_executable = ""
 # simulations to run and their settings
 # batch_sizes = [64, 64]
 # case_names = ["case118", "case118"]
@@ -37,13 +38,37 @@ def get_output_name(case_name, initial_failures, load_generation_ratio, load_she
 
 
 def run_simulation(case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size, output_name=None):
-    if output_name is None:
-        output_name = get_output_name(
-            case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
-    arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
-    print(arguments)
-    os.system(f"{executable} {arguments}")
-    return output_name
+    if sys.platform == "win32":
+        if output_name is None:
+            output_name = get_output_name(
+                case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
+        arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
+        print(arguments)
+        os.system(f"{windows_executable} {arguments}")
+        return output_name
+    elif sys.platform == "linux" or sys.platform == "linux2":
+        print("Work on Linux platform still in progress.")
+        if output_name is None:
+            output_name = get_output_name(
+                case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
+        arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
+        print(arguments)
+        os.system(f"{executable} {arguments}")
+        return output_name
+    elif sys.platform == "darwin":
+        print("Work on Mac platform is still in progress")
+        print("Work on Linux platform still in progress.")
+        if output_name is None:
+            output_name = get_output_name(
+                case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
+        arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
+        print(arguments)
+        os.system(f"{executable} {arguments}")
+        return output_name
+        return 0
+    else:
+        print("Unknown platform: ", sys.platform)
+        return 0
 
 
 # print(run_simulation("case118", 10, 1, 0.7, 0.1, 0.1, 2, "blah"))
