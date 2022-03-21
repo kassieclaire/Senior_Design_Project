@@ -1,9 +1,10 @@
 import os
 import sys
 from unittest import case
-# defines
+# defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
 mac_executable = ""
+linux_executable = ""
 # simulations to run and their settings
 # batch_sizes = [64, 64]
 # case_names = ["case118", "case118"]
@@ -53,7 +54,7 @@ def run_simulation(case_name, iterations, initial_failures, load_generation_rati
                 case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
         arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
         print(arguments)
-        os.system(f"{executable} {arguments}")
+        os.system(f"{linux_executable} {arguments}")
         return output_name
     elif sys.platform == "darwin":
         print("Work on Mac platform is still in progress")
