@@ -57,13 +57,12 @@ def run_simulation(case_name, iterations, initial_failures, load_generation_rati
         return output_name
     elif sys.platform == "darwin":
         print("Work on Mac platform is still in progress")
-        print("Work on Linux platform still in progress.")
         if output_name is None:
             output_name = get_output_name(
                 case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
         arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
         print(arguments)
-        os.system(f"{executable} {arguments}")
+        os.system(f"{mac_executable} {arguments}")
         return output_name
         return 0
     else:

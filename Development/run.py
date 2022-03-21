@@ -1,4 +1,5 @@
 from json import load
+from tkinter.tix import TEXT
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from matplotlib.ticker import NullFormatter  # useful for `logit` scale
@@ -11,6 +12,7 @@ import os
 from PIL import Image, ImageTk
 from urllib import request
 #some defines for sizes for things for standardization
+TEXT_COLOR = '#000000'
 BACKGROUND_COLOR = '#FFFFFF'
 INPUT_BOX_SIZE = (25,1)
 INPUT_FRAME_SIZE = (300,60)
@@ -136,7 +138,7 @@ input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)
                     0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                 [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                           key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Button('More Options'), sg.Button('Run')]
+                [sg.Button('More Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
                 ]
 # TODO: get rid of this, make it display the pstop instead
 #filename = os.getcwd() + "/graph_png.png"
