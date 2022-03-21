@@ -11,6 +11,7 @@ import os
 from PIL import Image, ImageTk
 from urllib import request
 #some defines for sizes for things for standardization
+BACKGROUND_COLOR = '#FFFFFF'
 INPUT_BOX_SIZE = (25,1)
 INPUT_FRAME_SIZE = (300,60)
 # slider names
@@ -175,12 +176,12 @@ output_column_s = [[sg.Canvas(key=FIGURE_2)],
                   sg.Text('Click on Line')],
                  ]
 
-layout = [[sg.Text('Cascading failure Simulator GUI')],
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c'), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c'),
-           sg.pin(sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False)), sg.pin(sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False))]]
+layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color = 'Black')],
+          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR), sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+           sg.pin(sg.Column(input_column_s, key = COLUMN_INPUT_S, element_justification='c', visible = False, background_color=BACKGROUND_COLOR)), sg.pin(sg.Column(output_column_s, key=COLUMN_OUTPUT_S, element_justification='c', visible = False, background_color=BACKGROUND_COLOR))]]
 # create the form and show it without the plot
 window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                   layout, finalize=True, element_justification='center', font='Helvetica 18')
+                   layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
 # add the plot to the window
 fig = draw_plot()
 fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
