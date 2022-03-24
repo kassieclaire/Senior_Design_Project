@@ -1,0 +1,6 @@
+TODO:
+- Split GUI into two -- add options window at start
+- Get graphing working again
+- more options setup completed
+- get the topology graphing into the simple GUI
+- 
