@@ -107,6 +107,7 @@ def simple_gui(debug = False):
             estimation_error = values[SLIDER_CAPACITY_ESTIMATION_ERROR]
             # info on figure update
             fig.clear()
+            #TODO: Give this its own thread and some sort of mutex lock as well
             fig = run_button_action(fig, case_name, iterations, initial_failures,
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
             # draw_figure(window[FIGURE].TKCanvas, fig)
