@@ -32,6 +32,7 @@ def get_branch_dataframe(mpc_matrix):
     return branch_data
 
 def plot_topology():
+    #TODO: add a plot_new_topology function, which doesn't create a new figure, but takes one as an input (or keeps things consistent some other way)
     fig = plt.figure()
     mpc_matrix = load_mpc(MPC_PATH)
     branch_data = get_branch_dataframe(mpc_matrix)

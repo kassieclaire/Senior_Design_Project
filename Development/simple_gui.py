@@ -1,9 +1,9 @@
-#function imports
+# function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
 from plot_topology import plot_topology
-#package imports
+# package imports
 import os
 import matplotlib
 from matplotlib.ticker import NullFormatter  # useful for `logit` scale
@@ -19,8 +19,8 @@ import networkx as nx
 # color and size specifications
 TEXT_COLOR = '#000000'
 BACKGROUND_COLOR = '#FFFFFF'
-INPUT_BOX_SIZE = (25,1)
-INPUT_FRAME_SIZE = (300,60)
+INPUT_BOX_SIZE = (25, 1)
+INPUT_FRAME_SIZE = (300, 60)
 # slider keys
 SLIDER_ITERATIONS = 'iterations'
 SLIDER_LOAD = 'slider_load'
@@ -44,53 +44,56 @@ error_tooltip = "This represents the estimation error operators have when determ
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
 initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
 
-#Temporarily defined values TODO: Actually calculate these per run!
+# Temporarily defined values TODO: Actually calculate these per run!
 cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
 
-def simple_gui(debug = False):
-    #setup beforehand
+
+def simple_gui(debug=False):
+    # setup beforehand
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
-    #columns
+    # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
-                    0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
-                          key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
-                [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
-                    0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
-                [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
-                          key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
-                [sg.Button('More Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
-                ]
-    output_column = [[sg.Canvas(key=FIGURE)],
-                 # output_column = [[sg.Image(filename=filename)],
-                 [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                     str(delivery_loss_percent) + "%")],
-                 [sg.Text('Max Line Capacity: '),
-                  sg.Text(str(cap_loss) + " MW")],
-                 [sg.Text('Worst-off Cluster: '), sg.Text(str(worst_cluster))],
-                 [sg.Text('Probability of failure: '),
-                  sg.Text('Click on Line')],
-                 ]
-    
-    #full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color = TEXT_COLOR)], 
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR), 
-           sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
-    
-    #create the window with the layout
+                    [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
+                        0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
+                    [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
+                                                                   key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
+                    [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
+                        0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
+                    [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
+                                                                       key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
+                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
+                    ]
+    output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
+                     [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+                         str(delivery_loss_percent) + "%")],
+                     [sg.Text('Max Line Capacity: '),
+                     sg.Text(str(cap_loss) + " MW")],
+                     [sg.Text('Worst-off Cluster: '),
+                      sg.Text(str(worst_cluster))],
+                     [sg.Text('Probability of failure: '),
+                     sg.Text('Click on Line')]
+                     ]
+
+    # full layout
+    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+              [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+
+    # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                    layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
+                       layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
     # add the plot to the window
     #fig = draw_plot()
     fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
-    
-    #run loop
+
+    # run loop
     event = ''
     while True:
         event, values = window.read()
@@ -107,21 +110,30 @@ def simple_gui(debug = False):
             estimation_error = values[SLIDER_CAPACITY_ESTIMATION_ERROR]
             # info on figure update
             fig.clear()
-            #TODO: Give this its own thread and some sort of mutex lock as well
+            # TODO: Give this its own thread and some sort of mutex lock as well
             fig = run_button_action(fig, case_name, iterations, initial_failures,
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
             # draw_figure(window[FIGURE].TKCanvas, fig)
             fig.canvas.draw()
+        #TODO: update these so they do stuff with the topology -- update the topology plot
+        elif event == 'First':
+            print(event)
+        elif event == 'Last':
+            print(event)
+        elif event == 'Forward':
+            print(event)
+        elif event == 'Back':
+            print(event)
         elif event == 'More Options':
-            #if user selects more options, then return the action more options
+            # if user selects more options, then return the action more options
             window.close()
-            #return the action for more options
+            # return the action for more options
             return 'more'
-            
+
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             break
 
     window.close()
-    #quit application
+    # quit application
     return 'quit'
