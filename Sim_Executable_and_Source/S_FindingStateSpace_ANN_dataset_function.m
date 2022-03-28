@@ -1,10 +1,10 @@
-function [States, IniFtable, mpc_cell] = S_FindingStateSpace_ANN_dataset_function(CaseName, Iterations, InitialFailures, LoadGenerationRatio, LoadShedConstant, EstimationError, batch_size) %Add initial_failure_cluster variable, set by default to -1
+function [States, IniFtable] = S_FindingStateSpace_ANN_dataset_function(CaseName, Iterations, InitialFailures, LoadGenerationRatio, LoadShedConstant, EstimationError, batch_size) %Add initial_failure_cluster variable, set by default to -1
 %Function that returns a state space for (Topology, # of iterations, # of initial failures, load-generation ratio (r), LoadShedConstant (\theta), and capcacity estimation error (e))
 %clc;
 %clear all;
 %close all;
 define_constants;
-%CaseName='case300';
+%CaseName='case118'; 
 %define the batch size
 simulation_group_size = batch_size;
 
@@ -158,18 +158,19 @@ if (NumIt > simulation_group_size)
         fprintf("Starting simulations from starting index %d to ending index %d\n\r", start_index, end_index);
         StatesCell = cellmat((end_index-start_index+1), 1, 10000, 14);
         mpc_cell = cell(end_index-start_index+1, 1);
-        final_index = (end_index-start_index+1);
+        final_index = (end_index-start_index+1); %number of cell per batch that are saved
         parfor s=1:final_index % for every iteration under the same setting
             %s %print out s
             success = 0;
             state_number = start_index + s - 1;
-            %DC code
+            %DC code 
+            % 
             %StatesCell(s, 1) = {DCPowerFlowSimulation(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
             %AC code
             while (success == 0)
                 [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 StatesCell(s, 1) = {States};
-                mpc_cell(s) = {resulting_mpc};
+                mpc_cell(s) = {resulting_mpc}
                 % [StatesCell(s, 1), mpc_cell(s, 1)] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 %[StatesCell(s, 1), resulting_mpc] -- change at lines 165 AND 213(ish)
                 %{StatesCell(s, 1), mpc_cell(s, 1)}
@@ -181,11 +182,24 @@ if (NumIt > simulation_group_size)
                     fprintf("Restarting simulation...\n");
                 end
             end
+            
         end
+        %save the contents of the mpc cell here. go to index 1 to final
+        %index
+        mkdir folder_mpc
+        for s=1:final_index % for every iteration under the same setting
+            state_number = start_index + s - 1; %use this at the end of the file name
+            fname= strcat("file_", num2str(state_number),'.mat');
+            mpc=mpc_cell(s);
+            save('fname', 'mpc');
+            movefile(fname, 'folder_mpc');
+            
+            %save each into a separate folder rather than in the main folder
+         end 
         %Temporary -- turn states cell array back to array
         States = cell2mat(StatesCell); %Turn cells to states matrix
         simulation_group_name = strcat("temp_", num2str(k));
-        save(simulation_group_name, "States");
+        save(simulation_group_name, "States"); %how to save function
         clear StatesCell;
         clear States;
     end
