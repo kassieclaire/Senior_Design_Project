@@ -44,7 +44,7 @@ def run_button_action(fig, case_name, iterations, initial_failures, load_generat
     # generate the graph
     p_stop_df = cascading_failure_function(
         states_matrix_name=name + "_sm", initial_failure_table_name=name + "_if")
-    fig = plt.figure()
+    #fig = plt.figure()
     plt.plot('x_values', 'cascade_stop', data=p_stop_df,
              color='skyblue', linewidth=1)
     plt.xlabel('Number of Failed Lines')

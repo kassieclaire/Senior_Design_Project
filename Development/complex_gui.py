@@ -108,8 +108,10 @@ def complex_gui(debug = False):
             #TODO: Give this its own thread, and some sort of mutex lock as well
             fig = run_button_action(fig, case_name, iterations, initial_failures,
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-            # draw_figure(window[FIGURE].TKCanvas, fig)
+            #fig_canvas_agg.draw()
+            #draw_figure(fig_canvas_agg, fig)
             fig.canvas.draw()
+            
         elif event == 'Less Options':
             #if user selects more options, then return the action more options
             window.close()
