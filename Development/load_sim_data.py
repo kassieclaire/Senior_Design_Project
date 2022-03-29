@@ -83,23 +83,23 @@ def load_initial_failures(initial_failure_table_name='initial_failures', number_
     # return cascading_failure_df
 
 
-def generate_simulation_history_array(state_matrix, initial_failures) -> 'list[Simulation_Line_History]':
+# def generate_simulation_history_array(state_matrix, initial_failures) -> 'list[Simulation_Line_History]':
 
-    for i, single_sim_init_failures in enumerate(initial_failures):
-        print(i, single_sim_init_failures)
+#     for i, single_sim_init_failures in enumerate(initial_failures):
+#         print(i, single_sim_init_failures)
 
+if __name__ == '__main__':
+    state_matrix = load_state_matrix(SIM_STATE_MATRIX)
+    initial_failures = load_initial_failures(SIM_INITIAL_FAILURES)
 
-state_matrix = load_state_matrix(SIM_STATE_MATRIX)
-initial_failures = load_initial_failures(SIM_INITIAL_FAILURES)
+    # state_matrix = state_matrix[:100]
+    initial_failures = initial_failures[:100]
 
-# state_matrix = state_matrix[:100]
-initial_failures = initial_failures[:100]
+    # print(state_matrix['Failed Line Index'])
+    print(max(state_matrix['Failed Line Index']))
+    print(initial_failures)
 
-# print(state_matrix['Failed Line Index'])
-print(max(state_matrix['Failed Line Index']))
-print(initial_failures)
-
-# generate_simulation_history_array(state_matrix, initial_failures)
-print(state_matrix.shape)
-# print([state_matrix['Failed Line Index'][i]
-#   for i in range(state_matrix.shape[0])])
+    # generate_simulation_history_array(state_matrix, initial_failures)
+    print(state_matrix.shape)
+    # print([state_matrix['Failed Line Index'][i]
+    #   for i in range(state_matrix.shape[0])])

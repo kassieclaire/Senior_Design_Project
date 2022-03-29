@@ -88,22 +88,23 @@ def labels_at_indices(arr: 'list[int]', val_if_present, val_if_not_present, num_
     return [val_if_present if i in arr else val_if_not_present for i in range(num_indices)]
 
 
-def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, line_failed_negative_one_indices, simulation_index, iteration_index, bus_labels: bool = True, branch_labels: bool = False, axes=None, fig=None):
+def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index, bus_labels: bool = True, branch_labels: bool = False, axes=None, fig=None):
     if fig is None:
         fig = plt.figure()
     else:
         fig = plt.figure(fig.number)
     failure_indix_arr = get_failure_array_at_iteration(
-        initial_failures, state_matrix, line_failed_negative_one_indices, simulation_index, iteration_index)
+        initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index)
     # shift the indices down 1 as python is zero-based and therefore networkx will be looking for zero-based indices
     failure_indix_arr = [x - 1 for x in failure_indix_arr]
     colors = labels_at_indices(
         failure_indix_arr, 'r', 'b', mpc_branch_dataframe.shape[0])
-    edges = [(branch_data['from bus number'][i], branch_data['to bus number'][i])
-             for i in range(branch_data.shape[0])]
+    edges = [(mpc_branch_dataframe['from bus number'][i], mpc_branch_dataframe['to bus number'][i])
+             for i in range(mpc_branch_dataframe.shape[0])]
     g = nx.Graph()
     g.add_edges_from(edges)
-    edge_labels = {edges[i]: i + 1 for i in range(branch_data.shape[0])}
+    edge_labels = {edges[i]: i +
+                   1 for i in range(mpc_branch_dataframe.shape[0])}
     # TODO change the weight to reflect load
     weights = [5 if i == 'r' else 1 for i in colors]
     pos = nx.kamada_kawai_layout(g)
@@ -116,113 +117,117 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, line_fail
     return fig
 
 
-mpc_matrix = load_mpc(MPC_PATH)
-branch_data = get_branch_dataframe(mpc_matrix)
+if __name__ == '__main__':
+    mpc_matrix = load_mpc(MPC_PATH)
+    mpc_branch_dataframe = get_branch_dataframe(mpc_matrix)
 
-# print(branch_data)
+    # print(branch_data)
 
-# edges = [(branch_data['from bus number'][i], branch_data['to bus number'][i])
-#          for i in range(branch_data.shape[0])]
+    # edges = [(branch_data['from bus number'][i], branch_data['to bus number'][i])
+    #          for i in range(branch_data.shape[0])]
 
-# # print(edges)
+    # # print(edges)
 
-# g = nx.Graph()
+    # g = nx.Graph()
 
-# g.add_edges_from(edges)
+    # g.add_edges_from(edges)
 
-# edge_labels = {edges[i]: i + 1 for i in range(branch_data.shape[0])}
-# # print(edge_labels)
+    # edge_labels = {edges[i]: i + 1 for i in range(branch_data.shape[0])}
+    # # print(edge_labels)
 
-# colors = ['r' if i % 10 == 0 else 'b' for i in range(branch_data.shape[0])]
-# weights = [5 if i == 'r' else 1 for i in colors]
-# # print(colors)
+    # colors = ['r' if i % 10 == 0 else 'b' for i in range(branch_data.shape[0])]
+    # weights = [5 if i == 'r' else 1 for i in colors]
+    # # print(colors)
 
-# # pos = nx.spring_layout(g, seed=SEED)
-# pos = nx.kamada_kawai_layout(g)
+    # # pos = nx.spring_layout(g, seed=SEED)
+    # pos = nx.kamada_kawai_layout(g)
 
+    # nx.draw(g, pos=pos, with_labels=True, node_size=60,
+    #         font_size=8, edge_color=colors, width=weights)
+    # nx.draw_networkx_edge_labels(
+    # g, pos, edge_labels=edge_labels, font_size=6, rotate=False)
+    # plt.show()
 
-# nx.draw(g, pos=pos, with_labels=True, node_size=60,
-#         font_size=8, edge_color=colors, width=weights)
-# nx.draw_networkx_edge_labels(
-# g, pos, edge_labels=edge_labels, font_size=6, rotate=False)
-# plt.show()
+    # print(max(branch_data['from bus number']))
+    # print(max(branch_data['to bus number']))
 
-# print(max(branch_data['from bus number']))
-# print(max(branch_data['to bus number']))
+    state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
+    initial_failures = load_sim_data.load_initial_failures(
+        SIM_INITIAL_FAILURES)
 
-state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
-initial_failures = load_sim_data.load_initial_failures(SIM_INITIAL_FAILURES)
+    # state_matrix = state_matrix[:100]
+    # initial_failures = initial_failures[:100]
 
-# state_matrix = state_matrix[:100]
-# initial_failures = initial_failures[:100]
+    # print(state_matrix['Failed Line Index'])
+    # print(max(state_matrix['Failed Line Index']))
+    # print(initial_failures)
 
-# print(state_matrix['Failed Line Index'])
-# print(max(state_matrix['Failed Line Index']))
-# print(initial_failures)
+    # generate_simulation_history_array(state_matrix, initial_failures)
+    print(state_matrix.shape)
+    # print([state_matrix['Failed Line Index'][i]
+    #   for i in range(state_matrix.shape[0])])
 
-# generate_simulation_history_array(state_matrix, initial_failures)
-print(state_matrix.shape)
-# print([state_matrix['Failed Line Index'][i]
-#   for i in range(state_matrix.shape[0])])
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(state_matrix[['Steady State', 'Failed Line Index']])
 
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-    print(state_matrix[['Steady State', 'Failed Line Index']])
+    negativeOneIndices = get_statematrix_steady_state_negative_one_indices(
+        state_matrix)
 
-negativeOneIndices = get_statematrix_steady_state_negative_one_indices(
-    state_matrix)
+    print([x for x in zip(negativeOneIndices, range(len(negativeOneIndices)))])
+    # print(get_single_simulation_state_matrix(state_matrix, zeroIndices, 30))
+    print(get_sim_index_with_most_failures(negativeOneIndices))
+    # print(get_single_simulation_state_matrix(state_matrix, zeroIndices, get_sim_index_with_most_failures(zeroIndices)))
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(get_single_simulation_state_matrix(state_matrix, negativeOneIndices,
+                                                 get_sim_index_with_most_failures(negativeOneIndices)))
+        # print(get_single_simulation_state_matrix(state_matrix, negativeOneIndices, 0))
 
-print([x for x in zip(negativeOneIndices, range(len(negativeOneIndices)))])
-# print(get_single_simulation_state_matrix(state_matrix, zeroIndices, 30))
-print(get_sim_index_with_most_failures(negativeOneIndices))
-# print(get_single_simulation_state_matrix(state_matrix, zeroIndices, get_sim_index_with_most_failures(zeroIndices)))
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-    print(get_single_simulation_state_matrix(state_matrix, negativeOneIndices,
-          get_sim_index_with_most_failures(negativeOneIndices)))
-    # print(get_single_simulation_state_matrix(state_matrix, negativeOneIndices, 0))
+    for i in range(10):
+        print(get_failure_array_at_iteration(initial_failures, state_matrix,
+                                             negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), i))
 
-for i in range(10):
-    print(get_failure_array_at_iteration(initial_failures, state_matrix,
-          negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), i))
+    print()
 
-print()
+    print(labels_at_indices([1, 2, 6], 'present', 'not present', 15))
 
-print(labels_at_indices([1, 2, 6], 'present', 'not present', 15))
+    # fig = plot_network(branch_data, initial_failures, state_matrix,
+    #                    negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), 4, True, False)
+    # fig.show()
 
-# fig = plot_network(branch_data, initial_failures, state_matrix,
-#                    negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), 4, True, False)
-# fig.show()
+    # plt.figure(fig.number)
+    # plt.show()
 
-# plt.figure(fig.number)
-# plt.show()
+    most_failure_sim_index = get_sim_index_with_most_failures(
+        negativeOneIndices)
+    iteration = 0
+    _, _, numIterations = get_simulation_start_end_iterations(
+        negativeOneIndices, most_failure_sim_index)
+    print(f"{numIterations} iterations")
+    plt.ion()
+    # fig = plt.figure()
+    fig = None
+    # ax = plt.axes()
+    ax = None
+    # print(fig.axes)
+    while(1):
+        # for i in range(numIterations):
+        #     fig = plot_network(branch_data, initial_failures, state_matrix,
+        #                        negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), iteration, True, False)
+        #     plt.figure(fig.number)
+        #     plt.show(block=False)
 
-most_failure_sim_index = get_sim_index_with_most_failures(negativeOneIndices)
-iteration = 0
-_, _, numIterations = get_simulation_start_end_iterations(
-    negativeOneIndices, most_failure_sim_index)
-print(f"{numIterations} iterations")
-plt.ion()
-fig = plt.figure()
-# ax = plt.axes()
-ax = None
-print(fig.axes)
-plt.show(block=False)
-while(1):
-    # for i in range(numIterations):
-    #     fig = plot_network(branch_data, initial_failures, state_matrix,
-    #                        negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), iteration, True, False)
-    #     plt.figure(fig.number)
-    #     plt.show(block=False)
-
-    action = input("w to advance, s to go back, x to exit")
-    if action == 'w':
-        iteration += 1
-        # plt.close()
-    elif action == 's':
-        iteration -= 1
-        # plt.close()
-    elif action == 'x':
-        break
-    fig.clear()
-    fig = plot_network(branch_data, initial_failures, state_matrix,
-                       negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), iteration, True, False, ax, fig)
+        action = input("w to advance, s to go back, x to exit")
+        if action == 'w':
+            iteration += 1
+            # plt.close()
+        elif action == 's':
+            iteration -= 1
+            # plt.close()
+        elif action == 'x':
+            break
+        if fig is not None:
+            fig.clear()
+        fig = plot_network(mpc_branch_dataframe, initial_failures, state_matrix,
+                           negativeOneIndices, get_sim_index_with_most_failures(negativeOneIndices), iteration, True, False, ax, fig)
+        plt.show(block=False)
     # plt.figure(fig.number)

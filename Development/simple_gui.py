@@ -2,7 +2,9 @@
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
-from plot_topology import plot_topology
+# from plot_topology import plot_topology
+import generate_mpc_plot_networkx
+import load_sim_data
 # package imports
 import os
 import matplotlib
@@ -27,6 +29,9 @@ SLIDER_LOAD = 'slider_load'
 SLIDER_INITIAL_FAILURES = 'slider_init_failures'
 SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
 SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
+MPC_PATH = 'case118_mpc_presim.mat'
+SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
+SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
 # Figure keys
 FIGURE = 'figure_1'
 # column keys
@@ -69,7 +74,8 @@ def simple_gui(debug=False):
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
-                     [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                         'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
                          str(delivery_loss_percent) + "%")],
                      [sg.Text('Max Line Capacity: '),
@@ -90,11 +96,28 @@ def simple_gui(debug=False):
                        layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
     # add the plot to the window
     #fig = draw_plot()
-    fig = plot_topology()
+
+    # load mpc plotting data
+    state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
+    initial_failures = load_sim_data.load_initial_failures(
+        SIM_INITIAL_FAILURES)
+    branch_data = generate_mpc_plot_networkx.get_branch_dataframe(
+        generate_mpc_plot_networkx.load_mpc(MPC_PATH))
+    negativeOneIndices = generate_mpc_plot_networkx.get_statematrix_steady_state_negative_one_indices(
+        state_matrix)
+    mostFailureSimIndex = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
+        negativeOneIndices)
+    _, _, numIterations = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
+        negativeOneIndices, mostFailureSimIndex)
+    simIteration = 0
+    fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
+                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=None)
+    # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
 
     # run loop
     event = ''
+
     while True:
         event, values = window.read()
         print(event)
@@ -115,15 +138,30 @@ def simple_gui(debug=False):
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
             # draw_figure(window[FIGURE].TKCanvas, fig)
             fig.canvas.draw()
-        #TODO: update these so they do stuff with the topology -- update the topology plot
+        # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
+            simIteration = 0
+            fig.clear()
+            fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
+                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig.canvas.draw()
         elif event == 'Last':
             print(event)
         elif event == 'Forward':
             print(event)
+            simIteration += 1
+            fig.clear()
+            fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
+                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig.canvas.draw()
         elif event == 'Back':
             print(event)
+            simIteration -= 1
+            fig.clear()
+            fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
+                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig.canvas.draw()
         elif event == 'More Options':
             # if user selects more options, then return the action more options
             window.close()
