@@ -1,9 +1,8 @@
 
 
-import enum
+from ast import Num
 from json import load
 from random import seed
-from urllib import request
 from xmlrpc.client import Boolean
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -115,6 +114,10 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulatio
             g, ax=axes, pos=pos, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
+
+
+def increment_if_result_in_range(val: Num, increment_val: Num, rng: range) -> Num:
+    return val + increment_val if val + increment_val in rng else val
 
 
 if __name__ == '__main__':

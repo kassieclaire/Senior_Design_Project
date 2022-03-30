@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import scipy.io
 
-from sim_failure_structure import Simulation_Line_History
-
 SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
 SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
 
