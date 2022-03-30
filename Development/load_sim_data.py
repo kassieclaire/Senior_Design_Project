@@ -2,9 +2,46 @@
 import pandas as pd
 import numpy as np
 import scipy.io
+import generate_mpc_plot_networkx
 
 SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
 SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
+
+
+class SimulationResults:
+    def __init__(self, sim_name, mpc_name):
+        # TODO load the mpc
+        self.mpc = generate_mpc_plot_networkx.load_mpc("")
+        self.graph = None
+        self.bus_pos = None
+        # TODO update the path names
+        self.state_matrix = load_state_matrix(sim_name + "_sm.mat")
+        self.initial_failures = load_initial_failures(sim_name + "_if.mat")
+        self.sim_end_indices = generate_mpc_plot_networkx.get_statematrix_steady_state_negative_one_indices(
+            self.state_matrix)
+        self.sim_index_most_failures = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
+            self.sim_end_indices)
+
+    def get_iteration_steps(self, iteration_index: int) -> int:
+        """
+        Returns the number of steps (line failures after initial failures) in an iteration.
+
+        Args:
+        iteration_index: int
+            Index of the iteration to return the number of steps/failures for. Zero-based.
+
+        Returns: int
+            Number of steps in the iteration stated by `iteration_index`
+        """
+        _, _, numSteps = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
+            self.sim_end_indices, iteration_index)
+        return numSteps
+
+    def get_iteration_with_most_failures(self) -> int:
+        """
+        Returns the index of the simulation iteration with the most failures.
+        """
+        return self.sim_index_most_failures
 
 
 def load_state_matrix(states_matrix_name='states', number_of_lines=186):
