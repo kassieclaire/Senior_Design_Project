@@ -1,5 +1,6 @@
 
 
+import load_sim_data
 from ast import Num
 from json import load
 from random import seed
@@ -8,8 +9,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import scipy.io
 import pandas as pd
-
-import load_sim_data
 
 
 MPC_PATH = 'case118_mpc_presim.mat'
@@ -106,12 +105,18 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulatio
                    1 for i in range(mpc_branch_dataframe.shape[0])}
     # TODO change the weight to reflect load
     weights = [5 if i == 'r' else 1 for i in colors]
-    pos = nx.kamada_kawai_layout(g)
-    nx.draw(g, pos=pos, ax=axes, with_labels=bus_labels, node_size=60,
+    # calculate the positions for the nodes
+    # kamanda_kawai layout algorithm is deterministic, making results repeatable
+    # save the positions into the graph object
+    nx.set_node_attributes(g, nx.kamada_kawai_layout(g), 'pos')
+    # draw the graph object onto the active figure
+    # NOTE: position must be explicitly set, or else a nondeterministic spring layout will be used
+    # This remains true even when
+    nx.draw(g, pos=nx.get_node_attributes(g, 'pos'), ax=axes, with_labels=bus_labels, node_size=60,
             font_size=8, edge_color=colors, width=weights)
     if branch_labels:
         nx.draw_networkx_edge_labels(
-            g, ax=axes, pos=pos, edge_labels=edge_labels, font_size=6, rotate=False)
+            g, pos=nx.get_node_attributes(g, 'pos'), ax=axes, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
 
