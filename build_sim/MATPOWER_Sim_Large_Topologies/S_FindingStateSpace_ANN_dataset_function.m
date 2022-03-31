@@ -103,7 +103,7 @@ end
 mpc1 = OriginalMPC; % this is the MPC with separated load and generator
 %save the original mpc
 mpc=mpc1;
-save("CaseName" + "_presim", "mpc")
+save(CaseName + "_presim", "mpc")
 
 BranchMatrix=mpc1.branch;
 NumBranches=length(BranchMatrix(:,1));
@@ -159,7 +159,7 @@ if (NumIt > simulation_group_size)
         StatesCell = cellmat((end_index-start_index+1), 1, 10000, 14);
         mpc_cell = cell(end_index-start_index+1,1);
         final_index = (end_index-start_index+1);
-        for s=1:final_index % for every iteration under the same setting
+        parfor s=1:final_index % for every iteration under the same setting
             %s %print out s
             success = 0;
             state_number = start_index + s - 1;

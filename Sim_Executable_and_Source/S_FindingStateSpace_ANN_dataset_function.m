@@ -170,7 +170,7 @@ if (NumIt > simulation_group_size)
             while (success == 0)
                 [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 StatesCell(s, 1) = {States};
-                mpc_cell(s) = {resulting_mpc}
+                mpc_cell(s) = {resulting_mpc};
                 % [StatesCell(s, 1), mpc_cell(s, 1)] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 %[StatesCell(s, 1), resulting_mpc] -- change at lines 165 AND 213(ish)
                 %{StatesCell(s, 1), mpc_cell(s, 1)}
