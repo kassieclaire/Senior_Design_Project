@@ -167,7 +167,7 @@ if (NumIt > simulation_group_size)
             %StatesCell(s, 1) = {DCPowerFlowSimulation(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
             %AC code
             while (success == 0)
-                [States, resulting_mpc] = {S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
+                [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 StatesCell(s, 1) = {States};
                 mpc_cell(s)={resulting_mpc};
                 
@@ -182,12 +182,14 @@ if (NumIt > simulation_group_size)
         end
         %save mpc contents here to individual file and then into seperate
         %folder
-        mkdir folder_mpc
+        if not(isfolder('folder_mpc'))
+            mkdir('folder_mpc')
+        end
         for s=1:final_index % for every iteration under the same setting
             state_number = start_index + s - 1; %use this at the end of the file name
             fname= strcat("file_", num2str(state_number),'.mat');
             mpc=mpc_cell(s);
-            save('fname', 'mpc');
+            save(fname, 'mpc');
             movefile(fname, 'folder_mpc');
         end 
         
