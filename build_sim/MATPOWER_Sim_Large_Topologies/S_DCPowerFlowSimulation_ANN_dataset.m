@@ -1,5 +1,5 @@
 %Made into function by Kassie Povinelli
-function States = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)
+function [StatesCell, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)
 
     
     %%  Human error probability
@@ -334,4 +334,6 @@ function States = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, 
         
                 end % end of saving the states
             end
+            StatesCell={States};
+            result_mpc={mpc1};
 end

@@ -1,4 +1,4 @@
-%%IEEE118
+1%%IEEE118
 % clear;
 % topology = 'case118';
 % iterations = 10000;
@@ -12,7 +12,7 @@
 %%IEEE39_2
 clear;
 topology = 'case39';
-iterations = 1000;
+iterations = 50;
 %initialFailures = 2;
 loadGenerationRatio = .9; %reduce R
 loadShedConstant = .7;

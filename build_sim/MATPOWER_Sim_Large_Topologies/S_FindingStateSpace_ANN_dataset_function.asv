@@ -157,9 +157,9 @@ if (NumIt > simulation_group_size)
         %start the group of simulations in parallel
         fprintf("Starting simulations from starting index %d to ending index %d\n\r", start_index, end_index);
         StatesCell = cellmat((end_index-start_index+1), 1, 10000, 14);
-        mpc_cell = cell(end_index-start_index+1,1);
+        mpc_cell=cell(end_index-start_index+1,1);
         final_index = (end_index-start_index+1);
-        for s=1:final_index % for every iteration under the same setting
+        parfor s=1:final_index % for every iteration under the same setting
             %s %print out s
             success = 0;
             state_number = start_index + s - 1;
@@ -167,7 +167,7 @@ if (NumIt > simulation_group_size)
             %StatesCell(s, 1) = {DCPowerFlowSimulation(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
             %AC code
             while (success == 0)
-                [States, resulting_mpc] = {S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
+                [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
                 StatesCell(s, 1) = {States};
                 mpc_cell(s)={resulting_mpc};
                 
