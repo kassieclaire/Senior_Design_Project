@@ -16,6 +16,8 @@ import PySimpleGUI as sg
 from json import load
 from tkinter.tix import TEXT
 import networkx as nx
+from tkinter import filedialog
+import shutil
 
 
 # color and size specifications
@@ -70,7 +72,7 @@ def simple_gui(debug=False):
                         0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                     [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                                                                        key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
-                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                    [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
@@ -167,6 +169,26 @@ def simple_gui(debug=False):
             window.close()
             # return the action for more options
             return 'more'
+
+        elif event == 'Save':
+            #if user selects save, open save menu
+
+            original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
+            target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
+
+            shutil.copyfile(original, target)
+
+            original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
+            target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
+
+            shutil.copyfile(original, target)
+
+            plt.savefig('p_stop.png')
+
+            file = filedialog.asksaveasfile()
+            filetext = 'sup dawg'
+            file.write(filetext)
+            file.close()
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
