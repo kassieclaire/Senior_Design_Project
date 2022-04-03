@@ -1,0 +1,3 @@
+Number of iterations exceeds amount allowed for single group. Splitting into 7 simulations of max size 16
+Starting simulations from starting index 1 to ending index 16
+
