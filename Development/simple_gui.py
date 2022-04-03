@@ -16,6 +16,7 @@ import PySimpleGUI as sg
 from json import load
 from tkinter.tix import TEXT
 import networkx as nx
+import tkinter as tk
 from tkinter import filedialog
 import shutil
 
@@ -173,22 +174,27 @@ def simple_gui(debug=False):
         elif event == 'Save':
             #if user selects save, open save menu
 
-            original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
-            target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
+            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
+            # target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
 
-            shutil.copyfile(original, target)
+            # shutil.copyfile(original, target)
 
-            original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
-            target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
+            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
+            # target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
 
-            shutil.copyfile(original, target)
+            # shutil.copyfile(original, target)
+            root = tk.Tk()
+            root.withdraw()
 
-            plt.savefig('p_stop.png')
+            file = filedialog.asksaveasfilename(
+                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
 
-            file = filedialog.asksaveasfile()
-            filetext = 'sup dawg'
-            file.write(filetext)
-            file.close()
+            plt.savefig(file)
+
+            # file = filedialog.asksaveasfile()
+            # filetext = 'sup dawg'
+            # file.write(filetext)
+            # file.close()
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
