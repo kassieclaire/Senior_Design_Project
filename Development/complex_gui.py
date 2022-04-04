@@ -12,6 +12,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import PySimpleGUI as sg
 from json import load
 from tkinter.tix import TEXT
+import tkinter as tk
+from tkinter import filedialog
 
 # color and size specifications
 TEXT_COLOR = '#000000'
@@ -62,7 +64,7 @@ def complex_gui(debug = False):
                             size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
                   [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
                             size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Button('Less Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
+                  [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Less Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
                   ]
     output_column = [[sg.Canvas(key=FIGURE)],
                    # output_column = [[sg.Image(filename=filename)],
@@ -117,7 +119,18 @@ def complex_gui(debug = False):
             window.close()
             #return the action for more options
             return 'less'
-            
+
+        elif event == 'Save':
+            #if user selects save, open save menu
+
+            root = tk.Tk()
+            root.withdraw()
+
+            file = filedialog.asksaveasfilename(
+                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
+
+            plt.savefig(file)
+
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             break
