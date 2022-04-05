@@ -76,7 +76,7 @@ def simple_gui(debug=False):
                         0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                     [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                                                                        key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
-                    [sg.Button('Save Simple DF', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Save DF', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
