@@ -139,7 +139,7 @@ def simple_gui(debug=False):
             # TODO: Give this its own thread and some sort of mutex lock as well
             simIteration = 0
             (initial_failures, states_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
-                                    load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
+                                                                                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
             # draw_figure(window[FIGURE].TKCanvas, fig)
             fig.canvas.draw()
         # TODO: update these so they do stuff with the topology -- update the topology plot
@@ -148,23 +148,28 @@ def simple_gui(debug=False):
             simIteration = 0
             fig.clear()
             fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
-                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'Last':
             print(event)
+            simIteration = numIterations - 1
+            fig.clear()
+            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
+                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig.canvas.draw()
         elif event == 'Forward':
             print(event)
             simIteration += 1
             fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, states_matrix,
-                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
+                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'Back':
             print(event)
             simIteration -= 1
             fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, states_matrix,
-                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
+                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'More Options':
             # if user selects more options, then return the action more options
@@ -173,7 +178,7 @@ def simple_gui(debug=False):
             return 'more'
 
         elif event == 'Save':
-            #if user selects save, open save menu
+            # if user selects save, open save menu
 
             # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
             # target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
