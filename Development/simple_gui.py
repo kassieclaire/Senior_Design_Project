@@ -63,6 +63,9 @@ def simple_gui(debug=False):
     # setup beforehand
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
+
+    menu_def = [['&File', ['&Save Figure', '&Save Simple DF',
+                          '&Save DF']]]
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
@@ -73,7 +76,7 @@ def simple_gui(debug=False):
                         0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
                     [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
                                                                        key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
-                    [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                    [sg.Button('Save Simple DF', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Save DF', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
@@ -90,8 +93,9 @@ def simple_gui(debug=False):
                      ]
 
     # full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
-              [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+    layout = [[sg.Menu(menu_def, pad=(10,10), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR), sg.Text('Cascading failure Simulator GUI',
+                                  background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+                [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
 
     # create the window with the layout
@@ -171,30 +175,33 @@ def simple_gui(debug=False):
             # return the action for more options
             return 'more'
 
-        elif event == 'Save':
-            #if user selects save, open save menu
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
-
-            # shutil.copyfile(original, target)
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
-
-            # shutil.copyfile(original, target)
+        elif event == 'Save Figure':
+            #saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
-
             plt.savefig(file)
 
-            # file = filedialog.asksaveasfile()
-            # filetext = 'sup dawg'
-            # file.write(filetext)
-            # file.close()
+        elif event == 'Save DF':
+            #saves states_dataframe.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_dataframe.csv'
+            target = file
+            shutil.copyfile(original, target)
+
+        elif event == 'Save Simple DF':
+            #saves states_simple.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_simple.csv'
+            target = file
+            shutil.copyfile(original, target)
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
