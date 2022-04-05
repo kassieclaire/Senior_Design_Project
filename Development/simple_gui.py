@@ -193,9 +193,9 @@ def simple_gui(debug=False):
             root.withdraw()
 
             file = filedialog.asksaveasfilename(
-                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
+                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
 
-            plt.savefig(file)
+            plt.savefig(file, dpi=450)
 
             # file = filedialog.asksaveasfile()
             # filetext = 'sup dawg'
