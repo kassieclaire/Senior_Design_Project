@@ -1,2 +1,4 @@
 # Ignore python bytecode files
 *.pyc
+#ignore .mat files
+*.mat
