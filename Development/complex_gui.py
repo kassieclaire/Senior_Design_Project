@@ -2,6 +2,7 @@
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
+
 #package imports
 import os
 import matplotlib
@@ -52,6 +53,12 @@ num_lines = 186
 
 def complex_gui(debug = False):
     #setup beforehand
+    #set the style of the plot
+    #plt.style.use('ieee')
+    #set the plot dpi to 300
+    matplotlib.rcParams['figure.dpi'] = 200
+    #set the plot size to be square
+    matplotlib.rcParams['figure.figsize'] = (3,2.5)
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
     #columns

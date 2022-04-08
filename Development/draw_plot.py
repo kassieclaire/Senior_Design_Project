@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from p_stop_curve import cascading_failure_function
+from pStop_Generic import generate_generic_pStop
 import generate_mpc_plot_networkx
 from generate_states_dataframe import generate_states_df
 from load_sim_data import load_initial_failures
@@ -44,12 +45,14 @@ def run_button_action(fig, case_name, iterations, initial_failures, load_generat
                                    load_shed_constant, estimation_error, batch_size, output_name=name)
     else:
         print('Simulation with current settings already performed, loading matrices.')
+    #generate the df
+    states_df = generate_states_df(states_matrix_name=name + "_sm",initial_failure_table_name=name + "_if", clusters_matrix_name='cluster_branch_118', number_of_lines=186, use_test_cluster=False, output_df_name = "states_dataframe", use_simplified_df = False, save_as_csv = False)
+    # generate the df using pstop_generic
+    p_stop_df = generate_generic_pStop(states_df=states_df)
     # generate the graph
-    p_stop_df = cascading_failure_function(
-        states_matrix_name=name + "_sm", initial_failure_table_name=name + "_if")
     #fig = plt.figure()
     plt.plot('x_values', 'cascade_stop', data=p_stop_df,
-             color='skyblue', linewidth=1)
+             color='skyblue', linewidth=5)
     plt.xlabel('Number of Failed Lines')
     plt.ylabel('Cascade-Stop Probability')
     # plt.title('Cascade-Stop Probability vs Number of Line Failures')
