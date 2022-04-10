@@ -64,8 +64,9 @@ def simple_gui(debug=False):
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
 
-    menu_def = [['&File', ['&Save Figure', '&Save Simple DF',
-                          '&Save DF']]]
+    menu_def = [
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
@@ -93,10 +94,11 @@ def simple_gui(debug=False):
                      ]
 
     # full layout
-    layout = [[sg.Menu(menu_def, pad=(10,10), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR), sg.Text('Cascading failure Simulator GUI',
-                                  background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
-                [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
-               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+    layout = [[sg.pin(sg.Menu(menu_def, pad=(200, 200), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
+              [sg.Text('Cascading failure Simulator GUI',
+                       background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+                sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
 
     # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
@@ -176,7 +178,7 @@ def simple_gui(debug=False):
             return 'more'
 
         elif event == 'Save Figure':
-            #saves figure currently displayed
+            # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
             file = filedialog.asksaveasfilename(
@@ -184,7 +186,7 @@ def simple_gui(debug=False):
             plt.savefig(file)
 
         elif event == 'Save DF':
-            #saves states_dataframe.csv
+            # saves states_dataframe.csv
             root = tk.Tk()
             root.withdraw()
             file = filedialog.asksaveasfilename(
@@ -194,12 +196,22 @@ def simple_gui(debug=False):
             shutil.copyfile(original, target)
 
         elif event == 'Save Simple DF':
-            #saves states_simple.csv
+            # saves states_simple.csv
             root = tk.Tk()
             root.withdraw()
             file = filedialog.asksaveasfilename(
                 filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
             original = os.getcwd() + '\states_simple.csv'
+            target = file
+            shutil.copyfile(original, target)
+
+        elif event == 'Save States.mat':
+            # saves states in matlab file type
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("m", "*.m")), defaultextension=(("m", "*.m")))
+            original = os.getcwd() + '\states.mat'
             target = file
             shutil.copyfile(original, target)
 

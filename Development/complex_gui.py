@@ -1,8 +1,8 @@
-#function imports
+# function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
-#package imports
+# package imports
 import os
 import matplotlib
 from matplotlib.ticker import NullFormatter  # useful for `logit` scale
@@ -18,8 +18,8 @@ from tkinter import filedialog
 # color and size specifications
 TEXT_COLOR = '#000000'
 BACKGROUND_COLOR = '#FFFFFF'
-INPUT_BOX_SIZE = (25,1)
-INPUT_FRAME_SIZE = (300,60)
+INPUT_BOX_SIZE = (25, 1)
+INPUT_FRAME_SIZE = (300, 60)
 # direct input names
 ITERATIONS_INPUT = 'iterations_s'
 LOAD_INPUT = 'load_s'
@@ -44,53 +44,60 @@ error_tooltip = "This represents the estimation error operators have when determ
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
 initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
 
-#Temporarily defined values TODO: Actually calculate these per run!
+# Temporarily defined values TODO: Actually calculate these per run!
 cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
 
-def complex_gui(debug = False):
-    #setup beforehand
+
+def complex_gui(debug=False):
+    # setup beforehand
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
-    #columns
+
+    menu_def = [
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+
+    # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                  [sg.Frame('Load', [[sg.InputText(key=LOAD_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Initial Line Failures', [[sg.InputText(key=INITIAL_FAILURES_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Load Shed Constraints', [[sg.InputText(key=LOAD_SHED_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Less Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
-                  ]
+                    [sg.Frame('Load', [[sg.InputText(key=LOAD_INPUT, tooltip=load_tooltip,
+                                                     size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Initial Line Failures', [[sg.InputText(key=INITIAL_FAILURES_INPUT, tooltip=load_tooltip,
+                                                                      size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Load Shed Constraints', [[sg.InputText(key=LOAD_SHED_INPUT, tooltip=load_tooltip,
+                                                                      size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
+                                                                          size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Button('Less Options', button_color=(
+                        TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
+                    ]
     output_column = [[sg.Canvas(key=FIGURE)],
-                   # output_column = [[sg.Image(filename=filename)],
-                   [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                       str(delivery_loss_percent) + "%")],
-                   [sg.Text('Max Line Capacity: '),
-                    sg.Text(str(cap_loss) + " MW")],
-                   [sg.Text('Worst-off Cluster: '),
-                    sg.Text(str(worst_cluster))],
-                   [sg.Text('Probability of failure: '),
-                    sg.Text('Click on Line')],
-                   ]
-    
-    #full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color = TEXT_COLOR)], 
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR), 
-           sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
-    
-    #create the window with the layout
+                     # output_column = [[sg.Image(filename=filename)],
+                     [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+                         str(delivery_loss_percent) + "%")],
+                     [sg.Text('Max Line Capacity: '),
+                      sg.Text(str(cap_loss) + " MW")],
+                     [sg.Text('Worst-off Cluster: '),
+                      sg.Text(str(worst_cluster))],
+                     [sg.Text('Probability of failure: '),
+                      sg.Text('Click on Line')],
+                     ]
+
+    # full layout
+    layout = [[sg.pin(sg.Menu(menu_def, pad=(200, 200), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)),
+               sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+              [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+
+    # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                    layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
+                       layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
     # add the plot to the window
     fig = draw_plot()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
-    
-    #run loop
+
+    # run loop
     event = ''
     while True:
         event, values = window.read()
@@ -107,34 +114,61 @@ def complex_gui(debug = False):
             estimation_error = float(values[CAPACITY_ESTIMATION_ERROR_INPUT])
             # info on figure update
             fig.clear()
-            #TODO: Give this its own thread, and some sort of mutex lock as well
+            # TODO: Give this its own thread, and some sort of mutex lock as well
             fig = run_button_action(fig, case_name, iterations, initial_failures,
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-            #fig_canvas_agg.draw()
+            # fig_canvas_agg.draw()
             #draw_figure(fig_canvas_agg, fig)
             fig.canvas.draw()
-            
+
         elif event == 'Less Options':
-            #if user selects more options, then return the action more options
+            # if user selects more options, then return the action more options
             window.close()
-            #return the action for more options
+            # return the action for more options
             return 'less'
 
-        elif event == 'Save':
-            #if user selects save, open save menu
-
+        elif event == 'Save Figure':
+            # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
-
             plt.savefig(file)
+
+        elif event == 'Save DF':
+            # saves states_dataframe.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_dataframe.csv'
+            target = file
+            shutil.copyfile(original, target)
+
+        elif event == 'Save Simple DF':
+            # saves states_simple.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_simple.csv'
+            target = file
+            shutil.copyfile(original, target)
+
+        elif event == 'Save States.mat':
+            # saves states in matlab file type
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("m", "*.m")), defaultextension=(("m", "*.m")))
+            original = os.getcwd() + '\states.mat'
+            target = file
+            shutil.copyfile(original, target)
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             break
 
     window.close()
-    #quit application
+    # quit application
     return 'quit'
