@@ -27,6 +27,7 @@ BACKGROUND_COLOR = '#FFFFFF'
 INPUT_BOX_SIZE = (25, 1)
 INPUT_FRAME_SIZE = (300, 60)
 # slider keys
+TEXT_BOX_ITERATIONS = 'text_box_iterations'
 SLIDER_ITERATIONS = 'iterations'
 SLIDER_LOAD = 'slider_load'
 SLIDER_INITIAL_FAILURES = 'slider_init_failures'
@@ -44,6 +45,8 @@ SAVE_BUTTON = 'Save Image'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
+tooltip_iterations = "The number of iterations to run the simulation for. \n" + \
+    "Higher numbers of iterations will take longer, but will produce more reliable results."
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
     "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
     "and 0.0 represents no load"
@@ -87,6 +90,8 @@ def simple_gui(debug=False):
     sg.theme('LightGrey1')
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
+                    [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+                                                           size=INPUT_BOX_SIZE)]], border_width=10)],
                     [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
                         0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
                     [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
@@ -156,6 +161,14 @@ def simple_gui(debug=False):
             print('the "run" button has been pressed!')
             case_name = 'case118'
             iterations = 100000  # TODO: Make this an input
+            try:
+                iterations = int(values[TEXT_BOX_ITERATIONS])
+            except ValueError:
+                print(
+                    f'Invalid input for iterations. Using default value of {iterations}')
+                print(type(window[TEXT_BOX_ITERATIONS]))
+                window[TEXT_BOX_ITERATIONS].Update(str(iterations))
+                window.refresh()
             batch_size = 16
             load_generation_ratio = values[SLIDER_LOAD]
             initial_failures = int(values[SLIDER_INITIAL_FAILURES])
