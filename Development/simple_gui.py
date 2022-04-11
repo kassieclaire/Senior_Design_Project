@@ -121,6 +121,8 @@ def simple_gui(debug=False):
     # run loop
     event = ''
 
+    redrawFigure = False
+
     while True:
         event, values = window.read()
         print(event)
@@ -145,32 +147,25 @@ def simple_gui(debug=False):
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
+            redrawFigure = True
             simIteration = 0
-            fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
-                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
-            fig.canvas.draw()
+
         elif event == 'Last':
             print(event)
+            redrawFigure = True
+
             simIteration = numIterations - 1
-            fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
-                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
-            fig.canvas.draw()
+
         elif event == 'Forward':
             print(event)
+            redrawFigure = True
+
             simIteration += 1
-            fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
-                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
-            fig.canvas.draw()
+
         elif event == 'Back':
             print(event)
+            redrawFigure = True
             simIteration -= 1
-            fig.clear()
-            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
-                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
-            fig.canvas.draw()
         elif event == 'More Options':
             # if user selects more options, then return the action more options
             window.close()
@@ -205,6 +200,19 @@ def simple_gui(debug=False):
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             break
+
+        # check the bounds on the simulation iteration
+        if simIteration < 0:
+            simIteration = 0
+        elif simIteration >= numIterations:
+            simIteration = numIterations - 1
+        # redraw the figure if the iteration has changed
+        if redrawFigure:
+            fig.clear()
+            fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, state_matrix,
+                                                                 negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+            fig.canvas.draw()
+            redrawFigure = False
 
     window.close()
     # quit application
