@@ -40,7 +40,7 @@ FIGURE = 'figure_1'
 # column keys
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
-#descriptions and tooltips
+# descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
@@ -57,6 +57,27 @@ cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
+
+
+def disable_forward_back_buttons(window, simStep, numIterations):
+    """
+    Disables the iteration control buttons based on whether the iteration is at the start of end of the simulation
+    :param window: The window to disable the buttons in
+    :param simStep: The current step number
+    :param numIterations: The total number of steps in the iteration of the simulation
+    """
+    if simStep == 0:
+        window['Back'].update(disabled=True)
+        window['First'].update(disabled=True)
+    else:
+        window['Back'].update(disabled=False)
+        window['First'].update(disabled=False)
+    if simStep == numIterations - 1:
+        window['Forward'].update(disabled=True)
+        window['Last'].update(disabled=True)
+    else:
+        window['Forward'].update(disabled=False)
+        window['Last'].update(disabled=False)
 
 
 def simple_gui(debug=False):
@@ -98,7 +119,7 @@ def simple_gui(debug=False):
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
                        layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
     # add the plot to the window
-    #fig = draw_plot()
+    # fig = draw_plot()
 
     # load mpc plotting data
     state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
@@ -117,6 +138,7 @@ def simple_gui(debug=False):
                                                   negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=None)
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
+    disable_forward_back_buttons(window, simIteration, numIterations)
 
     # run loop
     event = ''
@@ -213,6 +235,8 @@ def simple_gui(debug=False):
                                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
             fig.canvas.draw()
             redrawFigure = False
+        # disable first and last buttons if at the beginning or end of the simulation
+        disable_forward_back_buttons(window, simIteration, numIterations)
 
     window.close()
     # quit application
