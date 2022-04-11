@@ -101,17 +101,23 @@ def simple_gui(debug=False):
     state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
     initial_failures = load_sim_data.load_initial_failures(
         SIM_INITIAL_FAILURES)
-    branch_data = generate_mpc_plot_networkx.get_branch_dataframe(
-        generate_mpc_plot_networkx.load_mpc(MPC_PATH))
-    negativeOneIndices = generate_mpc_plot_networkx.get_statematrix_steady_state_negative_one_indices(
-        state_matrix)
-    mostFailureSimIndex = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
-        negativeOneIndices)
-    _, _, numIterations = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
-        negativeOneIndices, mostFailureSimIndex)
-    simIteration = 0
-    fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
-                                                  negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=None)
+    graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+        state_matrix, initial_failures, MPC_PATH)
+    # branch_data = generate_mpc_plot_networkx.get_branch_dataframe(
+    #     generate_mpc_plot_networkx.load_mpc(MPC_PATH))
+    # negativeOneIndices = generate_mpc_plot_networkx.get_statematrix_steady_state_negative_one_indices(
+    #     state_matrix)
+    # mostFailureSimIndex = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
+    #     negativeOneIndices)
+    numIterations = graph_data.get_num_steps(
+        graph_data.get_iteration_index_with_most_failures())
+    # _, _, numIterations = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
+    #     negativeOneIndices, mostFailureSimIndex)
+    simStep = 0
+    fig = graph_data.plot_topology(
+        graph_data.get_iteration_index_with_most_failures(), simStep)
+    # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
+    #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
 
@@ -141,26 +147,26 @@ def simple_gui(debug=False):
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
-            simIteration = 0
+            simStep = 0
             fig.clear()
             fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
-                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+                                                          negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'Last':
             print(event)
         elif event == 'Forward':
             print(event)
-            simIteration += 1
+            simStep += 1
             fig.clear()
             fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
-                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+                                                          negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'Back':
             print(event)
-            simIteration -= 1
+            simStep -= 1
             fig.clear()
             fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
-                                                          negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
+                                                          negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=fig)
             fig.canvas.draw()
         elif event == 'More Options':
             # if user selects more options, then return the action more options

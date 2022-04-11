@@ -18,6 +18,74 @@ SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
 SEED = 42
 
 
+class TopologyIterationData:
+    def __init__(self, state_matrix, initial_failures, mpc_path):
+        mpc = load_mpc(mpc_path)
+        self.branch_dataframe = get_branch_dataframe(mpc)
+        self.state_matrix = state_matrix
+        self.initial_failures = initial_failures
+        self.sim_end_indices = get_statematrix_steady_state_negative_one_indices(
+            self.state_matrix)
+        self.sim_index_most_failures = get_sim_index_with_most_failures(
+            self.sim_end_indices)
+        edges = [(self.branch_dataframe['from bus number'][i], self.branch_dataframe['to bus number'][i])
+                 for i in range(self.branch_dataframe.shape[0])]
+        self.graph = nx.Graph()
+        self.graph.add_edges_from(edges)
+        self.edge_labels = {edges[i]: i +
+                            1 for i in range(self.branch_dataframe.shape[0])}
+        # calculate the positions for the nodes
+        # kamanda_kawai layout algorithm is deterministic, making results repeatable
+        # save the positions into the graph object
+        nx.set_node_attributes(
+            self.graph, nx.kamada_kawai_layout(self.graph), 'pos')
+
+    def plot_topology(self, iteration_index, step_index, fig=None, bus_labels: bool = True, branch_labels: bool = False):
+        if fig is None:
+            fig = plt.figure()
+        else:
+            fig = plt.figure(fig.number)
+        failure_index_arr = get_failure_array_at_iteration(
+            self.initial_failures, self.state_matrix, self.sim_end_indices, iteration_index, step_index)
+        # shift the indices down 1 as python is zero-based and therefore networkx will be looking for zero-based indices
+        failure_index_arr = [x - 1 for x in failure_index_arr]
+        colors = labels_at_indices(
+            failure_index_arr, 'r', 'b', self.branch_dataframe.shape[0])
+
+        # TODO change the weight to reflect load
+        weights = [5 if i == 'r' else 1 for i in colors]
+        # draw the graph object onto the active figure
+        # NOTE: position must be explicitly set, or else a nondeterministic spring layout will be used
+        # This remains true even when
+        nx.draw(self.graph, pos=nx.get_node_attributes(self.graph, 'pos'), with_labels=bus_labels, node_size=60,
+                font_size=8, edge_color=colors, width=weights)
+        if branch_labels:
+            nx.draw_networkx_edge_labels(
+                self.graph, pos=nx.get_node_attributes(self.graph, 'pos'), edge_labels=branch_labels, font_size=6, rotate=False)
+        # plt.show()
+        return fig
+
+    def get_iteration_index_with_most_failures(self) -> int:
+        """
+        Returns the index of the iteration with the most failures
+        """
+        return self.sim_index_most_failures
+
+    def get_iteration_start_end_steps(self, interation_index) -> int:
+        startIndex = self.sim_end_indices[interation_index -
+                                          1] + 1 if interation_index > 0 else 0
+        endIndex = self.sim_end_indices[interation_index] + 1
+        steps = endIndex - startIndex
+        return startIndex, endIndex, steps
+
+    def get_num_steps(self, interation_index) -> int:
+        """
+        Returns the number of steps (line failures after the initial failures) in the given iteration
+        """
+        _, _, steps = self.get_iteration_start_end_steps(interation_index)
+        return steps
+
+
 def load_mpc(path: str):
     mpc_matrix = scipy.io.loadmat(MPC_PATH)
     # removes data other than the actual MPC data

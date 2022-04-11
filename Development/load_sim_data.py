@@ -11,9 +11,8 @@ SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
 class SimulationResults:
     def __init__(self, sim_name, mpc_name):
         # TODO load the mpc
-        self.mpc = generate_mpc_plot_networkx.load_mpc("")
-        self.graph = None
-        self.bus_pos = None
+        self.mpc = generate_mpc_plot_networkx.load_mpc(mpc_name)
+        self.graphStorage = None
         # TODO update the path names
         self.state_matrix = load_state_matrix(sim_name + "_sm.mat")
         self.initial_failures = load_initial_failures(sim_name + "_if.mat")
