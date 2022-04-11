@@ -187,7 +187,29 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulatio
             g, pos=nx.get_node_attributes(g, 'pos'), ax=axes, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
-
+def plot_network_update(mpc_branch_dataframe, initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index, bus_labels: bool = True, branch_labels: bool = False, axes=None, fig=None):
+    failure_indix_arr = get_failure_array_at_iteration(
+        initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index)
+    # shift the indices down 1 as python is zero-based and therefore networkx will be looking for zero-based indices
+    failure_indix_arr = [x - 1 for x in failure_indix_arr]
+    colors = labels_at_indices(
+        failure_indix_arr, 'r', 'b', mpc_branch_dataframe.shape[0])
+    edges = [(mpc_branch_dataframe['from bus number'][i], mpc_branch_dataframe['to bus number'][i])
+             for i in range(mpc_branch_dataframe.shape[0])]
+    g = nx.Graph()
+    g.add_edges_from(edges)
+    edge_labels = {edges[i]: i +
+                   1 for i in range(mpc_branch_dataframe.shape[0])}
+    # TODO change the weight to reflect load
+    weights = [5 if i == 'r' else 1 for i in colors]
+    pos = nx.kamada_kawai_layout(g)
+    nx.draw(g, pos=pos, ax=axes, with_labels=bus_labels, node_size=60,
+            font_size=8, edge_color=colors, width=weights)
+    if branch_labels:
+        nx.draw_networkx_edge_labels(
+            g, ax=axes, pos=pos, edge_labels=edge_labels, font_size=6, rotate=False)
+    # plt.show()
+    return fig
 
 def increment_if_result_in_range(val: Num, increment_val: Num, rng: range) -> Num:
     return val + increment_val if val + increment_val in rng else val

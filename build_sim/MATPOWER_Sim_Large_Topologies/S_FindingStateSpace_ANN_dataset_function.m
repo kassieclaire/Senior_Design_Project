@@ -101,6 +101,10 @@ for i=1:NumIt
 end
 %%
 mpc1 = OriginalMPC; % this is the MPC with separated load and generator
+%save the original mpc
+mpc=mpc1;
+save(CaseName + "_presim", "mpc")
+
 BranchMatrix=mpc1.branch;
 NumBranches=length(BranchMatrix(:,1));
 BusMatrix=mpc1.bus;
@@ -153,6 +157,7 @@ if (NumIt > simulation_group_size)
         %start the group of simulations in parallel
         fprintf("Starting simulations from starting index %d to ending index %d\n\r", start_index, end_index);
         StatesCell = cellmat((end_index-start_index+1), 1, 10000, 14);
+        mpc_cell = cell(end_index-start_index+1,1);
         final_index = (end_index-start_index+1);
         parfor s=1:final_index % for every iteration under the same setting
             %s %print out s
@@ -162,7 +167,10 @@ if (NumIt > simulation_group_size)
             %StatesCell(s, 1) = {DCPowerFlowSimulation(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, s, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
             %AC code
             while (success == 0)
-                StatesCell(s, 1) = {S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex)};
+                [States, resulting_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC, NumBranches, NoCoopPercentageVector, StateCounter, TrueCaps, DGRatioVector, WhichInitialLoad, Capacity, state_number, IniFtable, len_DGRatioVector, len_DeltaVector, DeltaVector, len_NoCoopPercentageVector, FlowCap, DemandIndex);
+                StatesCell(s, 1) = {States};
+                mpc_cell(s)={resulting_mpc};
+                
                 States_Matrix = StatesCell{s, 1};
                 if States_Matrix(1,1) ~= -2
                     success = 1;
@@ -172,6 +180,19 @@ if (NumIt > simulation_group_size)
                 end
             end
         end
+        %save mpc contents here to individual file and then into seperate
+        %folder
+        if not(isfolder('folder_mpc'))
+            mkdir('folder_mpc')
+        end
+        for s=1:final_index % for every iteration under the same setting
+            state_number = start_index + s - 1; %use this at the end of the file name
+            fname= strcat("file_", num2str(state_number),'.mat');
+            mpc=mpc_cell(s);
+            save(fname, 'mpc');
+            movefile(fname, 'folder_mpc');
+        end 
+        
         %Temporary -- turn states cell array back to array
         States = cell2mat(StatesCell); %Turn cells to states matrix
         simulation_group_name = strcat("temp_", num2str(k));

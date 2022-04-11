@@ -1,8 +1,9 @@
-#function imports
+# function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
-#package imports
+
+# package imports
 import os
 import matplotlib
 from matplotlib.ticker import NullFormatter  # useful for `logit` scale
@@ -12,13 +13,16 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import PySimpleGUI as sg
 from json import load
 from tkinter.tix import TEXT
+import tkinter as tk
+from tkinter import filedialog
 
 # color and size specifications
 TEXT_COLOR = '#000000'
 BACKGROUND_COLOR = '#FFFFFF'
-INPUT_BOX_SIZE = (25,1)
-INPUT_FRAME_SIZE = (300,60)
+INPUT_BOX_SIZE = (25, 1)
+INPUT_FRAME_SIZE = (300, 60)
 # direct input names
+TEXT_BOX_ITERATIONS = 'text_box_iterations'
 ITERATIONS_INPUT = 'iterations_s'
 LOAD_INPUT = 'load_s'
 INITIAL_FAILURES_INPUT = 'initial_failures_s'
@@ -33,6 +37,8 @@ COLUMN_OUTPUT = 'output_column'
 #descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
+tooltip_iterations = "The number of iterations to run the simulation for. \n" + \
+    "Higher numbers of iterations will take longer, but will produce more reliable results."
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
     "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
     "and 0.0 represents no load"
@@ -42,53 +48,63 @@ error_tooltip = "This represents the estimation error operators have when determ
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
 initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
 
-#Temporarily defined values TODO: Actually calculate these per run!
+# Temporarily defined values TODO: Actually calculate these per run!
 cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
 
-def complex_gui(debug = False):
-    #setup beforehand
+
+def complex_gui(debug=False):
+    # setup beforehand
+    # set the style of the plot
+    # plt.style.use('ieee')
+    # set the plot dpi to 300
+    matplotlib.rcParams['figure.dpi'] = 200
+    # set the plot size to be square
+    matplotlib.rcParams['figure.figsize'] = (3, 2.5)
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
-    #columns
+    # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                  [sg.Frame('Load', [[sg.InputText(key=LOAD_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Initial Line Failures', [[sg.InputText(key=INITIAL_FAILURES_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Load Shed Constraints', [[sg.InputText(key=LOAD_SHED_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
-                            size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                  [sg.Button('Less Options', button_color = (TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color = (TEXT_COLOR, BACKGROUND_COLOR))]
-                  ]
+                    [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+                                                           size=INPUT_BOX_SIZE)]], border_width=10)],
+                    [sg.Frame('Load', [[sg.InputText(key=LOAD_INPUT, tooltip=load_tooltip,
+                                                     size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Initial Line Failures', [[sg.InputText(key=INITIAL_FAILURES_INPUT, tooltip=load_tooltip,
+                                                                      size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Load Shed Constraints', [[sg.InputText(key=LOAD_SHED_INPUT, tooltip=load_tooltip,
+                                                                      size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
+                                                                          size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
+                    [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Less Options', button_color=(
+                        TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
+                    ]
     output_column = [[sg.Canvas(key=FIGURE)],
-                   # output_column = [[sg.Image(filename=filename)],
-                   [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                       str(delivery_loss_percent) + "%")],
-                   [sg.Text('Max Line Capacity: '),
-                    sg.Text(str(cap_loss) + " MW")],
-                   [sg.Text('Worst-off Cluster: '),
-                    sg.Text(str(worst_cluster))],
-                   [sg.Text('Probability of failure: '),
-                    sg.Text('Click on Line')],
-                   ]
-    
-    #full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color = TEXT_COLOR)], 
-          [sg.Column(input_column, key = COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR), 
-           sg.Column(output_column, key = COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
-    
-    #create the window with the layout
+                     # output_column = [[sg.Image(filename=filename)],
+                     [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+                         str(delivery_loss_percent) + "%")],
+                     [sg.Text('Max Line Capacity: '),
+                      sg.Text(str(cap_loss) + " MW")],
+                     [sg.Text('Worst-off Cluster: '),
+                      sg.Text(str(worst_cluster))],
+                     [sg.Text('Probability of failure: '),
+                      sg.Text('Click on Line')],
+                     ]
+
+    # full layout
+    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+              [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+
+    # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                    layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
+                       layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
     # add the plot to the window
     fig = draw_plot()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
-    
-    #run loop
+
+    # run loop
     event = ''
     while True:
         event, values = window.read()
@@ -98,6 +114,14 @@ def complex_gui(debug = False):
             print('the "run" button has been pressed!')
             case_name = 'case118'
             iterations = 100000  # TODO: Make this an input
+            try:
+                iterations = int(values[TEXT_BOX_ITERATIONS])
+            except ValueError:
+                print(
+                    f'Invalid input for iterations. Using default value of {iterations}')
+                print(type(window[TEXT_BOX_ITERATIONS]))
+                window[TEXT_BOX_ITERATIONS].Update(str(iterations))
+                window.refresh()
             batch_size = 16
             load_generation_ratio = float(values[LOAD_INPUT])
             initial_failures = int(values[INITIAL_FAILURES_INPUT])
@@ -105,23 +129,34 @@ def complex_gui(debug = False):
             estimation_error = float(values[CAPACITY_ESTIMATION_ERROR_INPUT])
             # info on figure update
             fig.clear()
-            #TODO: Give this its own thread, and some sort of mutex lock as well
+            # TODO: Give this its own thread, and some sort of mutex lock as well
             fig = run_button_action(fig, case_name, iterations, initial_failures,
                                     load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-            #fig_canvas_agg.draw()
+            # fig_canvas_agg.draw()
             #draw_figure(fig_canvas_agg, fig)
             fig.canvas.draw()
-            
+
         elif event == 'Less Options':
-            #if user selects more options, then return the action more options
+            # if user selects more options, then return the action more options
             window.close()
-            #return the action for more options
+            # return the action for more options
             return 'less'
-            
+
+        elif event == 'Save':
+            # if user selects save, open save menu
+
+            root = tk.Tk()
+            root.withdraw()
+
+            file = filedialog.asksaveasfilename(
+                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
+
+            plt.savefig(file)
+
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             break
 
     window.close()
-    #quit application
+    # quit application
     return 'quit'
