@@ -124,6 +124,7 @@ def simple_gui(debug=False):
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
 
+
     # run loop
     event = ''
 
@@ -209,8 +210,9 @@ def simple_gui(debug=False):
             # saves states in matlab file type
             root = tk.Tk()
             root.withdraw()
-            file = filedialog.asksaveasfilename(
-                filetypes=(("m", "*.m")), defaultextension=(("m", "*.m")))
+            sg.popup('Please type ".mat" after file name in order to save file correctly')
+            file = filedialog.asksaveasfilename()
+                #filetypes=(("m", "*.m")), defaultextension=(("m", "*.m")))
             original = os.getcwd() + '\states.mat'
             target = file
             shutil.copyfile(original, target)

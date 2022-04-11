@@ -14,6 +14,7 @@ from json import load
 from tkinter.tix import TEXT
 import tkinter as tk
 from tkinter import filedialog
+import shutil
 
 # color and size specifications
 TEXT_COLOR = '#000000'
@@ -97,6 +98,7 @@ def complex_gui(debug=False):
     fig = draw_plot()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
 
+
     # run loop
     event = ''
     while True:
@@ -159,11 +161,13 @@ def complex_gui(debug=False):
             # saves states in matlab file type
             root = tk.Tk()
             root.withdraw()
-            file = filedialog.asksaveasfilename(
-                filetypes=(("m", "*.m")), defaultextension=(("m", "*.m")))
+            sg.popup('Please type ".mat" after file name in order to save file correctly')
+            file = filedialog.asksaveasfilename()
+                #filetypes=(("mat", "*.mat")), defaultextension=(("mat", "*.mat")))
             original = os.getcwd() + '\states.mat'
             target = file
             shutil.copyfile(original, target)
+
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
