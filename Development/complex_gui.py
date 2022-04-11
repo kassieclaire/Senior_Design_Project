@@ -135,7 +135,8 @@ def complex_gui(debug=False):
             root.withdraw()
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
-            plt.savefig(file)
+            if file != '':
+                plt.savefig(file)
 
         elif event == 'Save DF':
             # saves states_dataframe.csv
@@ -144,8 +145,9 @@ def complex_gui(debug=False):
             file = filedialog.asksaveasfilename(
                 filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
             original = os.getcwd() + '\states_dataframe.csv'
-            target = file
-            shutil.copyfile(original, target)
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
         elif event == 'Save Simple DF':
             # saves states_simple.csv
@@ -154,19 +156,20 @@ def complex_gui(debug=False):
             file = filedialog.asksaveasfilename(
                 filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
             original = os.getcwd() + '\states_simple.csv'
-            target = file
-            shutil.copyfile(original, target)
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
         elif event == 'Save States.mat':
             # saves states in matlab file type
             root = tk.Tk()
             root.withdraw()
-            sg.popup('Please type ".mat" after file name in order to save file correctly')
-            file = filedialog.asksaveasfilename()
-                #filetypes=(("mat", "*.mat")), defaultextension=(("mat", "*.mat")))
+            file = filedialog.asksaveasfilename(
+                filetypes=[("mat", "*.mat")], defaultextension=("mat", "*.mat"))
             original = os.getcwd() + '\states.mat'
-            target = file
-            shutil.copyfile(original, target)
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
