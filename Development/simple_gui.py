@@ -19,6 +19,8 @@ import networkx as nx
 import tkinter as tk
 from tkinter import filedialog
 import shutil
+import simulation_select
+import gui_utilities
 
 
 # color and size specifications
@@ -91,15 +93,19 @@ def simple_gui(debug=False):
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
-                                                           size=INPUT_BOX_SIZE)]], border_width=10)],
-                    [sg.Frame('Load', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD, range=(
-                        0.0, 1.0), tooltip=load_tooltip, resolution=0.05)]], border_width=10)],
-                    [sg.Frame('Initial Line Failures', [[sg.Slider(range=(0, 50), tooltip=initial_failures_tooltip, orientation='horizontal',
-                                                                   key=SLIDER_INITIAL_FAILURES)]], border_width=10)],
-                    [sg.Frame('Operator Constraints', [[sg.Slider(orientation='horizontal', key=SLIDER_LOAD_SHED_CONST, range=(
-                        0.0, 1.0), tooltip=operator_constraints_tooltip, resolution=.05)]], border_width=10)],
-                    [sg.Frame('Line Capacity Uncertainty', [[sg.Slider(orientation='horizontal',
-                                                                       key=SLIDER_CAPACITY_ESTIMATION_ERROR, range=(0.0, 1.0), tooltip=error_tooltip, resolution=0.05)]], border_width=10)],
+                                                           size=INPUT_BOX_SIZE)]], border_width=10, relief='flat')],
+                    [sg.HorizontalSeparator()],
+                    [gui_utilities.make_slider_with_frame(
+                        label='Load', key=SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05)],
+                    [sg.HorizontalSeparator()],
+                    [gui_utilities.make_slider_with_frame(
+                        label='Initial Line Failures', key=SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1)],
+                    [sg.HorizontalSeparator()],
+                    [gui_utilities.make_slider_with_frame(
+                        label='Operator Constraints', key=SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05)],
+                    [sg.HorizontalSeparator()],
+                    [gui_utilities.make_slider_with_frame(
+                        label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
@@ -117,7 +123,6 @@ def simple_gui(debug=False):
                      [sg.Text('Probability of failure: '),
                      sg.Text('Click on Line')]
                      ]
-
     # full layout
     layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
@@ -125,7 +130,7 @@ def simple_gui(debug=False):
 
     # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                       layout, finalize=True, element_justification='center', font='Helvetica 18', background_color=BACKGROUND_COLOR)
+                       layout, finalize=True, element_justification='center', font=gui_utilities.FONT, background_color=BACKGROUND_COLOR)
     # add the plot to the window
     # fig = draw_plot()
 
