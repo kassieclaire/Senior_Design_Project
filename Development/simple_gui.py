@@ -234,6 +234,14 @@ def simple_gui(debug=False):
             # return the action for more options
             return 'more'
 
+        elif event == SAVE_BUTTON:
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            if file != '':
+                plt.savefig(file, dpi=450)
+
         elif event == 'Save Figure':
             # saves figure currently displayed
             root = tk.Tk()
