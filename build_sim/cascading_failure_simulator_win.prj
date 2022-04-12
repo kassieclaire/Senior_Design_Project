@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="3938100379" file="C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win.prj" location="C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim" name="cascading_failure_simulator_win" preferred-package-location="C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3938100379" file="/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim/cascading_failure_simulator_win.prj" location="/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim" name="cascading_failure_simulator_win" preferred-package-location="/Users/kassie/Documents/MATLAB/C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win\for_redistribution" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>cascading_failure_simulator</param.appname>
     <param.icon />
     <param.icons />
@@ -22,15 +22,23 @@ Estimation error: The maximum capacities for power lines are estimates of what t
 output name: the names of the output files, including the states matrix (output_name + "_sm.mat") and the initial failures table (output_name + "_if.mat")</param.description>
     <param.screenshot />
     <param.guid />
-    <param.installpath.string>\SACE Lab, Marquette University\cascading_failure_simulator\</param.installpath.string>
-    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.installpath.string>/SACE_Lab,_Marquette_University/cascading_failure_simulator/</param.installpath.string>
+    <param.installpath.combo>option.installpath.systemwideapp</param.installpath.combo>
     <param.logo />
     <param.install.notes />
-    <param.target.install.notes />
-    <param.intermediate>${PROJECT_ROOT}\cascading_failure_simulator_win\for_testing</param.intermediate>
-    <param.files.only>${PROJECT_ROOT}\cascading_failure_simulator_win\for_redistribution_files_only</param.files.only>
-    <param.output>${PROJECT_ROOT}\cascading_failure_simulator_win\for_redistribution</param.output>
-    <param.logdir>${PROJECT_ROOT}\cascading_failure_simulator_win</param.logdir>
+    <param.target.install.notes>In the following directions, replace MR/v911 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
+
+If the environment variable DYLD_LIBRARY_PATH is undefined, set it to the following string:
+
+MR/v911/runtime/maci64:MR/v911/sys/os/maci64:MR/v911/bin/maci64
+
+If it is defined, set it to the following:
+
+${DYLD_LIBRARY_PATH}:MR/v911/runtime/maci64:MR/v911/sys/os/maci64:MR/v911/bin/maci64</param.target.install.notes>
+    <param.intermediate>${PROJECT_ROOT}/cascading_failure_simulator_win/for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}/cascading_failure_simulator_win/for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}/cascading_failure_simulator_win/for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}/cascading_failure_simulator_win</param.logdir>
     <param.enable.clean.build>false</param.enable.clean.build>
     <param.user.defined.mcr.options />
     <param.target.type>subtarget.standalone</param.target.type>
@@ -75,7 +83,6 @@ output name: the names of the output files, including the states matrix (output_
       <param.installpath.combo />
       <param.logo />
       <param.install.notes />
-      <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
       <param.output />
@@ -90,96 +97,60 @@ output name: the names of the output files, including the states matrix (output_
       <param.web.mcr.name />
       <param.package.mcr.name />
       <param.no.mcr.name />
+      <param.windows.command.prompt />
       <param.native.matlab />
       <param.checkbox />
       <param.example />
     </unset>
     <fileset.main>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\simulate_cascade.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/simulate_cascade.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\ACTIVSg2000.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\caseBase.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\input.txt</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\loadcase.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\matpower7.1</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\reduce_information.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\run.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_CapFinder.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_cutLine.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_DCPowerFlowSimulation_ANN_dataset.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_DispatchPowerGrid.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_FindFailedLink.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_FindFullLoadOfGrid.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_FindingStateSpace_ANN_dataset_function.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_islandedGrid.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_MakePartialLSContGrid.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_ReadyTheCase.m</file>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\S_SeperateGenAndLoad.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/ACTIVSg2000.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_CapFinder.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_DCPowerFlowSimulation_ANN_dataset.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_DispatchPowerGrid.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_FindFailedLink.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_FindFullLoadOfGrid.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_FindingStateSpace_ANN_dataset_function.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_MakePartialLSContGrid.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_ReadyTheCase.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_SeperateGenAndLoad.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_cutLine.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/S_islandedGrid.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/caseBase.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/input.txt</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/loadcase.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/matpower7.1</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/reduce_information.m</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/run.m</file>
     </fileset.resources>
     <fileset.package>
-      <file>${PROJECT_ROOT}\MATPOWER_Sim_Large_Topologies\input.txt</file>
+      <file>${PROJECT_ROOT}/MATPOWER_Sim_Large_Topologies/input.txt</file>
     </fileset.package>
     <fileset.depfun>
-      <file>${PROJECT_ROOT}\osqp\osqp-0.6.2-matlab-windows64\codegen\make_emosqp.m</file>
-      <file>${PROJECT_ROOT}\osqp\osqp-0.6.2-matlab-windows64\codegen\render_workspace.m</file>
-      <file>${PROJECT_ROOT}\osqp\osqp-0.6.2-matlab-windows64\osqp_mex.mexw64</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opf_model\display.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opf_model\get_mpc.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opf_model\opf_model.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_constraints.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_costs.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_legacy_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_lin_constraint.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_named_set.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_nln_constraint.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_nln_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_quad_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_var.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\add_vars.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\build_cost_params.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\compute_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\describe_idx.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\display.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\eval_legacy_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\eval_nln_constraint.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\eval_nln_constraint_hess.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\eval_nln_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\eval_quad_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\get.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\get_cost_params.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\get_idx.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\get_userdata.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\getN.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\getv.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\init_indexed_name.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\linear_constraints.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\opt_model.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\params_legacy_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\params_lin_constraint.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\params_nln_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\params_quad_cost.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\params_var.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\valid_named_set_type.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\varsets_cell2struct.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\varsets_idx.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\varsets_len.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\@opt_model\varsets_x.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\opf_consfcn.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\opf_costfcn.m</file>
-      <file>C:\Users\Brendan Nenninger\Documents\college\Senior Design\matpower7.0\lib\opf_hessfcn.m</file>
+      <file>/Users/kassie/Documents/Code Repositories/Cascading_Failure_Sim/osqp/osqp-0.6.2-matlab-mac64/codegen/make_emosqp.m</file>
+      <file>/Users/kassie/Documents/Code Repositories/Cascading_Failure_Sim/osqp/osqp-0.6.2-matlab-mac64/codegen/render_workspace.m</file>
+      <file>/Users/kassie/Documents/Code Repositories/Cascading_Failure_Sim/osqp/osqp-0.6.2-matlab-mac64/osqp_mex.mexmaci64</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\cascading_failure_simulator_win\for_testing" name="cascading_failure_simulator.exe" optional="false">C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win\for_testing\cascading_failure_simulator.exe</file>
-      <file location="${PROJECT_ROOT}\cascading_failure_simulator_win\for_testing" name="splash.png" optional="false">C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win\for_testing\splash.png</file>
-      <file location="${PROJECT_ROOT}\cascading_failure_simulator_win\for_testing" name="readme.txt" optional="true">C:\Users\Brendan Nenninger\Documents\college\Senior Design\code repository\Senior_Design_Project\build_sim\cascading_failure_simulator_win\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}/cascading_failure_simulator_win/for_testing" name="splash.png" optional="false">/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim/cascading_failure_simulator_win/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/cascading_failure_simulator_win/for_testing" name="readme.txt" optional="true">/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim/cascading_failure_simulator_win/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/cascading_failure_simulator_win/for_testing" name="cascading_failure_simulator.app" optional="false">/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim/cascading_failure_simulator_win/for_testing/cascading_failure_simulator.app</file>
+      <file location="${PROJECT_ROOT}/cascading_failure_simulator_win/for_testing" name="run_cascading_failure_simulator.sh" optional="false">/Users/kassie/Documents/Code Repositories/Senior_Design_Project/build_sim/cascading_failure_simulator_win/for_testing/run_cascading_failure_simulator.sh</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2021a</root>
+      <root>/Applications/MATLAB_R2021b.app</root>
       <toolboxes>
+        <toolbox name="matlabcoder" />
         <toolbox name="neuralnetwork" />
       </toolboxes>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
       <toolbox>
         <neuralnetwork>
           <enabled>true</enabled>
@@ -187,18 +158,18 @@ output name: the names of the output files, including the states matrix (output_
       </toolbox>
     </matlab>
     <platform>
-      <unix>false</unix>
-      <mac>false</mac>
-      <windows>true</windows>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
       <win2k>false</win2k>
       <winxp>false</winxp>
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.0</osver>
+      <osver>12.2.1</osver>
       <os32>false</os32>
       <os64>true</os64>
-      <arch>win64</arch>
+      <arch>maci64</arch>
       <matlab>true</matlab>
     </platform>
   </configuration>
