@@ -206,8 +206,15 @@ def simple_gui(debug=False):
             fig.clear()
             # TODO: Give this its own thread and some sort of mutex lock as well
             simStep = 0
-            (initial_failures, states_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
-                                                                                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
+            # (initial_failures, state_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
+            #                                                                                                           load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
+            graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
+                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size)
+            numIterations = graph_data.get_num_steps(
+                graph_data.get_iteration_index_with_most_failures())
+            update_step_text(window, simStep, numIterations)
+            # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+            #     state_matrix, initial_failures, MPC_PATH)
             # draw_figure(window[FIGURE].TKCanvas, fig)
             fig.canvas.draw()
         # TODO: update these so they do stuff with the topology -- update the topology plot
