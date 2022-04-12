@@ -98,6 +98,10 @@ def simple_gui(debug=False):
     # setup beforehand
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
+
+    menu_def = [
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
@@ -130,7 +134,9 @@ def simple_gui(debug=False):
                      ]
 
     # full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+    layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
+              [sg.Text('Cascading failure Simulator GUI',
+                       background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
 
@@ -228,30 +234,47 @@ def simple_gui(debug=False):
             # return the action for more options
             return 'more'
 
-        elif event == SAVE_BUTTON:
-            # if user selects save, open save menu
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
-
-            # shutil.copyfile(original, target)
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
-
-            # shutil.copyfile(original, target)
+        elif event == 'Save Figure':
+            # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            if file != '':
+                plt.savefig(file, dpi=450)
 
-            plt.savefig(file, dpi=450)
+        elif event == 'Save DF':
+            # saves states_dataframe.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_dataframe.csv'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
-            # file = filedialog.asksaveasfile()
-            # filetext = 'sup dawg'
-            # file.write(filetext)
-            # file.close()
+        elif event == 'Save Simple DF':
+            # saves states_simple.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_simple.csv'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
+
+        elif event == 'Save States.mat':
+            # saves states in matlab file type
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=[("mat", "*.mat")], defaultextension=(("mat", "*.mat")))
+            original = os.getcwd() + '\states.mat'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
