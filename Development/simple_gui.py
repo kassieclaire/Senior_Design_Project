@@ -42,6 +42,8 @@ FIGURE = 'figure_1'
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
+STEP_TEXT_KEY = 'step_text'
+STEP_TEXT_FORMAT = 'Step %d of %d'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -61,6 +63,14 @@ cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
+
+
+def update_step_text(window, simStep, numIterations):
+    """
+    Updates the step text to show the current step of the simulation
+    """
+    window[STEP_TEXT_KEY].update(STEP_TEXT_FORMAT %
+                                 (simStep, numIterations - 1))
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -104,6 +114,7 @@ def simple_gui(debug=False):
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
+                     [sg.Text('', key=STEP_TEXT_KEY)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(SAVE_BUTTON, button_color=(
@@ -153,6 +164,7 @@ def simple_gui(debug=False):
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
     disable_forward_back_buttons(window, simStep, numIterations)
+    update_step_text(window, simStep, numIterations)
 
     # run loop
     event = ''
@@ -252,6 +264,7 @@ def simple_gui(debug=False):
             simStep = numIterations - 1
         # redraw the figure if the iteration has changed
         if redrawFigure:
+            update_step_text(window, simStep, numIterations)
             fig.clear()
             fig = graph_data.plot_topology(
                 graph_data.get_iteration_index_with_most_failures(), simStep, fig=fig)
