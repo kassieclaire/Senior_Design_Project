@@ -19,7 +19,6 @@ import networkx as nx
 import tkinter as tk
 from tkinter import filedialog
 import shutil
-import simulation_select
 import gui_utilities
 
 
