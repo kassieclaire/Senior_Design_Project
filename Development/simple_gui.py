@@ -12,7 +12,7 @@ from matplotlib.ticker import NullFormatter  # useful for `logit` scale
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import PySimpleGUI as sg
+import PySimpleGUIWeb as sg
 from json import load
 from tkinter.tix import TEXT
 import networkx as nx
@@ -107,38 +107,38 @@ def simple_gui(debug=False):
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
                                                            size=INPUT_BOX_SIZE)]], border_width=10, relief='flat')],
-                    [sg.HorizontalSeparator()],
+                    # [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Load', key=SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05)],
-                    [sg.HorizontalSeparator()],
+                    # [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Initial Line Failures', key=SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1)],
-                    [sg.HorizontalSeparator()],
+                    # [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Operator Constraints', key=SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05)],
-                    [sg.HorizontalSeparator()],
+                    # [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
-    output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
-                     [sg.Text('', key=STEP_TEXT_KEY)],
-                     [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
-                         'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Button(SAVE_BUTTON, button_color=(
-                         TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                         str(delivery_loss_percent) + "%")],
-                     [sg.Text('Max Line Capacity: '),
-                     sg.Text(str(cap_loss) + " MW")],
-                     [sg.Text('Worst-off Cluster: '),
-                      sg.Text(str(worst_cluster))],
-                     [sg.Text('Probability of failure: '),
-                     sg.Text('Click on Line')]
-                     ]
+    output_column = [  # [sg.Canvas(key=FIGURE)],
+        [sg.Text('', key=STEP_TEXT_KEY)],
+        [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+            'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+        [sg.Button(SAVE_BUTTON, button_color=(
+            TEXT_COLOR, BACKGROUND_COLOR))],
+        [sg.Text('Loss of Delivery Capacity: '), sg.Text(
+            str(delivery_loss_percent) + "%")],
+        [sg.Text('Max Line Capacity: '),
+         sg.Text(str(cap_loss) + " MW")],
+        [sg.Text('Worst-off Cluster: '),
+         sg.Text(str(worst_cluster))],
+        [sg.Text('Probability of failure: '),
+         sg.Text('Click on Line')]
+    ]
     # full layout
-    layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
+    layout = [[sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Text('Cascading failure Simulator GUI',
                        background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
@@ -146,7 +146,7 @@ def simple_gui(debug=False):
 
     # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                       layout, finalize=True, element_justification='center', font=gui_utilities.FONT, background_color=BACKGROUND_COLOR)
+                       layout, finalize=True, element_justification='center', font=gui_utilities.FONT, background_color=BACKGROUND_COLOR, web_port=80, web_start_browser=True)
     # add the plot to the window
     # fig = draw_plot()
 
@@ -172,8 +172,8 @@ def simple_gui(debug=False):
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
     #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
-    fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
-    disable_forward_back_buttons(window, simStep, numIterations)
+    # fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
+    # disable_forward_back_buttons(window, simStep, numIterations)
     update_step_text(window, simStep, numIterations)
 
     # run loop
