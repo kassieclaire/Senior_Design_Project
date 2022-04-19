@@ -250,16 +250,17 @@ def simple_gui(debug=False):
             root.withdraw()
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
-            if file != '':
+            # This checks if file is some representation of empty, ie '' or ()
+            # handles the fact that an empty return from asksaveasfilename returns '' on windows and () on linux
+            if file:
                 plt.savefig(file, dpi=450)
 
         elif event == 'Save Figure':
             # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-            file = filedialog.asksaveasfilename(
-                filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
-            if file != '':
+            file = filedialog.asksaveasfilename(filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            if file:
                 plt.savefig(file, dpi=450)
 
         elif event == 'Save DF':
@@ -268,8 +269,9 @@ def simple_gui(debug=False):
             root.withdraw()
             file = filedialog.asksaveasfilename(
                 filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            # TODO the states dataframe CANNOT be hardcoded
             original = os.getcwd() + '\states_dataframe.csv'
-            if file != '':
+            if file:
                 target = file
                 shutil.copyfile(original, target)
 
@@ -280,7 +282,7 @@ def simple_gui(debug=False):
             file = filedialog.asksaveasfilename(
                 filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
             original = os.getcwd() + '\states_simple.csv'
-            if file != '':
+            if file:
                 target = file
                 shutil.copyfile(original, target)
 
