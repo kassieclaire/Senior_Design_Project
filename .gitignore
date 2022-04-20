@@ -1,4 +1,7 @@
 # Ignore python bytecode files
 *.pyc
-#ignore .mat files
+# ignore .mat files
 *.mat
+
+# ignore the osqp folder
+build_sim/osqp/
