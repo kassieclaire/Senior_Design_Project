@@ -4,7 +4,7 @@ from unittest import case
 # defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
 mac_executable = ""
-linux_executable = ""
+linux_executable = "./sim_executable_linux/run_cascading_failure_simulator.sh /usr/local/MATLAB/MATLAB_Runtime/v911/"
 # simulations to run and their settings
 # batch_sizes = [64, 64]
 # case_names = ["case118", "case118"]
@@ -40,6 +40,7 @@ def get_output_name(case_name, initial_failures, load_generation_ratio, load_she
 
 def run_simulation(case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size, output_name=None):
     if sys.platform == "win32":
+        # TODO add a warning if the runtime is not installed
         if output_name is None:
             output_name = get_output_name(
                 case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
@@ -48,6 +49,7 @@ def run_simulation(case_name, iterations, initial_failures, load_generation_rati
         os.system(f"{windows_executable} {arguments}")
         return output_name
     elif sys.platform == "linux" or sys.platform == "linux2":
+        # TODO add a warning if the runtime is not installed
         print("Work on Linux platform still in progress.")
         if output_name is None:
             output_name = get_output_name(
