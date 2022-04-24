@@ -19,7 +19,6 @@ import networkx as nx
 import tkinter as tk
 from tkinter import filedialog
 import shutil
-import simulation_select
 import gui_utilities
 
 
@@ -44,6 +43,8 @@ FIGURE = 'figure_1'
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
+STEP_TEXT_KEY = 'step_text'
+STEP_TEXT_FORMAT = 'Step %d of %d'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -63,6 +64,14 @@ cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
+
+
+def update_step_text(window, simStep, numIterations):
+    """
+    Updates the step text to show the current step of the simulation
+    """
+    window[STEP_TEXT_KEY].update(STEP_TEXT_FORMAT %
+                                 (simStep, numIterations - 1))
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -90,6 +99,10 @@ def simple_gui(debug=False):
     # setup beforehand
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
+
+    menu_def = [
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
@@ -110,6 +123,7 @@ def simple_gui(debug=False):
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
+                     [sg.Text('', key=STEP_TEXT_KEY)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(SAVE_BUTTON, button_color=(
@@ -124,7 +138,9 @@ def simple_gui(debug=False):
                      sg.Text('Click on Line')]
                      ]
     # full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+    layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
+              [sg.Text('Cascading failure Simulator GUI',
+                       background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.Column(output_column, key=COLUMN_OUTPUT,
                          element_justification='c', background_color=BACKGROUND_COLOR),
@@ -160,6 +176,7 @@ def simple_gui(debug=False):
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
     disable_forward_back_buttons(window, simStep, numIterations)
+    update_step_text(window, simStep, numIterations)
 
     # run loop
     event = ''
@@ -191,8 +208,15 @@ def simple_gui(debug=False):
             fig.clear()
             # TODO: Give this its own thread and some sort of mutex lock as well
             simStep = 0
-            (initial_failures, states_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
-                                                                                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
+            # (initial_failures, state_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
+            #                                                                                                           load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
+            graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
+                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size)
+            numIterations = graph_data.get_num_steps(
+                graph_data.get_iteration_index_with_most_failures())
+            update_step_text(window, simStep, numIterations)
+            # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+            #     state_matrix, initial_failures, MPC_PATH)
             # draw_figure(window[FIGURE].TKCanvas, fig)
             fig.canvas.draw()
         # TODO: update these so they do stuff with the topology -- update the topology plot
@@ -224,29 +248,56 @@ def simple_gui(debug=False):
             return 'more'
 
         elif event == SAVE_BUTTON:
-            # if user selects save, open save menu
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_dataframe.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_dataframe.csv'
-
-            # shutil.copyfile(original, target)
-
-            # original = r'C:\Users\Carl Sustar\Documents\GitHub\Senior_Design_Project\states_simple.csv'
-            # target = r'C:\Users\Carl Sustar\Desktop\states_simple.csv'
-
-            # shutil.copyfile(original, target)
             root = tk.Tk()
             root.withdraw()
-
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            # This checks if file is some representation of empty, ie '' or ()
+            # handles the fact that an empty return from asksaveasfilename returns '' on windows and () on linux
+            if file:
+                plt.savefig(file, dpi=450)
 
-            plt.savefig(file, dpi=450)
+        elif event == 'Save Figure':
+            # saves figure currently displayed
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            if file:
+                plt.savefig(file, dpi=450)
 
-            # file = filedialog.asksaveasfile()
-            # filetext = 'sup dawg'
-            # file.write(filetext)
-            # file.close()
+        elif event == 'Save DF':
+            # saves states_dataframe.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            # TODO the states dataframe CANNOT be hardcoded
+            original = os.getcwd() + '\states_dataframe.csv'
+            if file:
+                target = file
+                shutil.copyfile(original, target)
+
+        elif event == 'Save Simple DF':
+            # saves states_simple.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_simple.csv'
+            if file:
+                target = file
+                shutil.copyfile(original, target)
+
+        elif event == 'Save States.mat':
+            # saves states in matlab file type
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=[("mat", "*.mat")], defaultextension=(("mat", "*.mat")))
+            original = os.getcwd() + '\states.mat'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
@@ -259,6 +310,7 @@ def simple_gui(debug=False):
             simStep = numIterations - 1
         # redraw the figure if the iteration has changed
         if redrawFigure:
+            update_step_text(window, simStep, numIterations)
             fig.clear()
             fig = graph_data.plot_topology(
                 graph_data.get_iteration_index_with_most_failures(), simStep, fig=fig)

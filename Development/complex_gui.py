@@ -2,7 +2,6 @@
 import sim_connect
 from p_stop_curve import cascading_failure_function
 from draw_plot import draw_plot, run_button_action, draw_figure
-
 # package imports
 import os
 import matplotlib
@@ -15,6 +14,7 @@ from json import load
 from tkinter.tix import TEXT
 import tkinter as tk
 from tkinter import filedialog
+import shutil
 
 # color and size specifications
 TEXT_COLOR = '#000000'
@@ -60,11 +60,15 @@ def complex_gui(debug=False):
     # set the style of the plot
     # plt.style.use('ieee')
     # set the plot dpi to 300
-    matplotlib.rcParams['figure.dpi'] = 200
+    #matplotlib.rcParams['figure.dpi'] = 200
     # set the plot size to be square
-    matplotlib.rcParams['figure.figsize'] = (3, 2.5)
+    #matplotlib.rcParams['figure.figsize'] = (3, 2.5)
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
+
+    menu_def = [
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
                     [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
@@ -77,7 +81,7 @@ def complex_gui(debug=False):
                                                                       size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
                     [sg.Frame('Line Capacity Uncertainty', [[sg.InputText(key=CAPACITY_ESTIMATION_ERROR_INPUT, tooltip=load_tooltip,
                                                                           size=INPUT_BOX_SIZE)]], border_width=10, size=INPUT_FRAME_SIZE)],
-                    [sg.Button('Save', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Less Options', button_color=(
+                    [sg.Button('Less Options', button_color=(
                         TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.Canvas(key=FIGURE)],
@@ -93,7 +97,8 @@ def complex_gui(debug=False):
                      ]
 
     # full layout
-    layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+    layout = [[sg.pin(sg.Menu(menu_def, pad=(200, 200), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)),
+               sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
 
@@ -142,16 +147,48 @@ def complex_gui(debug=False):
             # return the action for more options
             return 'less'
 
-        elif event == 'Save':
-            # if user selects save, open save menu
-
+        elif event == 'Save Figure':
+            # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-
             file = filedialog.asksaveasfilename(
                 filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf")), defaultextension=(("png", "*.png")))
+            if file != '':
+                plt.savefig(file)
 
-            plt.savefig(file)
+        elif event == 'Save DF':
+            # saves states_dataframe.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_dataframe.csv'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
+
+        elif event == 'Save Simple DF':
+            # saves states_simple.csv
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=(("csv", "*.csv"), ("Excel", "*.xlsx")), defaultextension=(("csv", "*.csv")))
+            original = os.getcwd() + '\states_simple.csv'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
+
+        elif event == 'Save States.mat':
+            # saves states in matlab file type
+            root = tk.Tk()
+            root.withdraw()
+            file = filedialog.asksaveasfilename(
+                filetypes=[("mat", "*.mat")], defaultextension=("mat", "*.mat"))
+            original = os.getcwd() + '\states.mat'
+            if file != '':
+                target = file
+                shutil.copyfile(original, target)
+
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
