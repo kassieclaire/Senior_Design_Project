@@ -60,9 +60,9 @@ def complex_gui(debug=False):
     # set the style of the plot
     # plt.style.use('ieee')
     # set the plot dpi to 300
-    matplotlib.rcParams['figure.dpi'] = 200
+    #matplotlib.rcParams['figure.dpi'] = 200
     # set the plot size to be square
-    matplotlib.rcParams['figure.figsize'] = (3, 2.5)
+    #matplotlib.rcParams['figure.figsize'] = (3, 2.5)
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
 

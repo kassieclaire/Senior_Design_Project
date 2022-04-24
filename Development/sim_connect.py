@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 from unittest import case
 # defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
@@ -46,6 +47,8 @@ def run_simulation(case_name, iterations, initial_failures, load_generation_rati
                 case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
         arguments = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
         print(arguments)
+        #run the simulation as a subprocess
+        #subprocess.run([windows_executable, arguments])
         os.system(f"{windows_executable} {arguments}")
         return output_name
     elif sys.platform == "linux" or sys.platform == "linux2":
