@@ -20,6 +20,7 @@ import tkinter as tk
 from tkinter import filedialog
 import shutil
 import gui_utilities
+import simulation_select
 
 
 # color and size specifications
@@ -261,7 +262,8 @@ def simple_gui(debug=False):
             # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-            file = filedialog.asksaveasfilename(filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            file = filedialog.asksaveasfilename(filetypes=(
+                ("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
             if file:
                 plt.savefig(file, dpi=450)
 
