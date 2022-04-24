@@ -126,7 +126,9 @@ def simple_gui(debug=False):
     # full layout
     layout = [[sg.Text('Cascading failure Simulator GUI', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
-               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+               sg.Column(output_column, key=COLUMN_OUTPUT,
+                         element_justification='c', background_color=BACKGROUND_COLOR),
+               simulation_select.getGUIElement()]]
 
     # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
