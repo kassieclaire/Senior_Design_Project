@@ -1,7 +1,7 @@
 # function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
-from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action
+from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action, initially_plot_network
 # from plot_topology import plot_topology
 import generate_mpc_plot_networkx
 import load_sim_data
@@ -180,11 +180,46 @@ def simple_gui(debug=False):
     event = ''
 
     redrawFigure = False
-
+    
+    #add a simulation running boolean
+    simulation_running = False
+    #add a boolean to check if it's time to graph
+    graph_time = False
+    #create an empty string for the simulation name
+    simulation_name = ''
+    #create empty strings for the simulation sm and if names
+    sim_sm_name = ''
+    sim_if_name = ''
+    #create a new variable process and set it to 0
+    process = 0
+    #forever loop
     while True:
         event, values = window.read()
         print(event)
         print(values)
+        #check if it's time to graph
+        if graph_time:
+            #check if files with sm or if names exist
+            if os.path.isfile(sim_sm_name) and os.path.isfile(sim_if_name):
+                #initially plot the graph
+                graph_data, fig = initially_plot_network(simulation_name, fig)
+                #get the data required from the graph data and draw the figure
+                numIterations = graph_data.get_num_steps(
+                graph_data.get_iteration_index_with_most_failures())
+                update_step_text(window, simStep, numIterations)
+                # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+                #     state_matrix, initial_failures, MPC_PATH)
+                # draw_figure(window[FIGURE].TKCanvas, fig)
+                fig.canvas.draw()
+                #set the simulation running to false
+                simulation_running = False
+                #set the graph time to false
+                graph_time = False
+                print("Simulation Completed")
+                
+            
+        
+
         if event == 'Run':
             print('the "run" button has been pressed!')
             case_name = 'case118'
@@ -208,15 +243,26 @@ def simple_gui(debug=False):
             simStep = 0
             # (initial_failures, state_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
             #                                                                                                           load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
-            graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
+            simulation_name, graph_data, fig, process = simple_run_button_action(fig, case_name, iterations, initial_failures,
                                                        load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-            numIterations = graph_data.get_num_steps(
+            #set the sm and if names
+            sim_sm_name = simulation_name + "_sm.mat"
+            sim_if_name = simulation_name + "_if.mat"
+            #check that there's no process
+            if process == 0:
+                numIterations = graph_data.get_num_steps(
                 graph_data.get_iteration_index_with_most_failures())
-            update_step_text(window, simStep, numIterations)
-            # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
-            #     state_matrix, initial_failures, MPC_PATH)
-            # draw_figure(window[FIGURE].TKCanvas, fig)
-            fig.canvas.draw()
+                update_step_text(window, simStep, numIterations)
+                # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+                #     state_matrix, initial_failures, MPC_PATH)
+                # draw_figure(window[FIGURE].TKCanvas, fig)
+                fig.canvas.draw()
+            #otherwise, there is a process, so let the user know and set the simulation running and to graph booleans to true
+            else:
+                print('simulation is running')
+                simulation_running = True
+                graph_time = True
+            
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
