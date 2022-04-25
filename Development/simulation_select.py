@@ -14,13 +14,12 @@ UPDATE_FILTERS_BUTTON = 'update_filters_button'
 
 
 def getGUIElement():
-    layout = sg.Column([[gui_utilities.make_slider_with_frame('Minimum Line Failures', SLIDER_MIN_LINE_FAILURES, range=(0, 100), resolution=1, enable_events=True)],
+    layout = sg.Column([[gui_utilities.make_slider_with_frame('Minimum Line Failures', SLIDER_MIN_LINE_FAILURES, range=(0, 100), resolution=1)],
                         [gui_utilities.make_slider_with_frame(
-                            'Maximum Line Failures', SLIDER_MAX_LINE_FAILURES, range=(0, 100), resolution=1, default_value=100, enable_events=True)],
+                            'Maximum Line Failures', SLIDER_MAX_LINE_FAILURES, range=(0, 100), resolution=1, default_value=100)],
                         [sg.Button('Update Filters',
                                    key=UPDATE_FILTERS_BUTTON, enable_events=True, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                        [sg.Listbox(values=['l1', 'l2', 'l3'],
-                                    key=ITERATION_SELECTION_LIST, enable_events=True, size=(15, 3))]])
+                        [sg.Listbox(values=[], key=ITERATION_SELECTION_LIST, enable_events=True, size=(15, 10))]])
     return layout
 
 

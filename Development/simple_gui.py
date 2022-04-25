@@ -44,6 +44,8 @@ FIGURE = 'figure_1'
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
+SIM_TEXT_KEY = 'sim_text'
+SIM_TEXT_FORMAT = 'Simulation %d out of %d'
 STEP_TEXT_KEY = 'step_text'
 STEP_TEXT_FORMAT = 'Step %d of %d'
 # descriptions and tooltips
@@ -73,6 +75,13 @@ def update_step_text(window, simStep, numIterations):
     """
     window[STEP_TEXT_KEY].update(STEP_TEXT_FORMAT %
                                  (simStep, numIterations - 1))
+
+
+def update_sim_text(window, iteration, numIterations):
+    """
+    Updates the simulation text to show the current iteration of the simulation
+    """
+    window[SIM_TEXT_KEY].update(SIM_TEXT_FORMAT % (iteration, numIterations))
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -124,6 +133,7 @@ def simple_gui(debug=False):
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
+                     [sg.Text('', key=SIM_TEXT_KEY)],
                      [sg.Text('', key=STEP_TEXT_KEY)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
@@ -168,8 +178,8 @@ def simple_gui(debug=False):
     iteration_index = graph_data.get_iteration_index_with_most_failures()
     num_steps = graph_data.get_num_steps(
         iteration_index)
-    # _, _, numIterations = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
-    #     negativeOneIndices, mostFailureSimIndex)
+    num_iterations = graph_data.get_num_iterations()
+
     simStep = 0
     fig = graph_data.plot_topology(
         iteration_index, simStep)
@@ -183,6 +193,7 @@ def simple_gui(debug=False):
     # TODO change this hardcoded value
     simulation_select.display_iterations(
         window, graph_data, 0, 3000)
+    update_sim_text(window, iteration_index, num_iterations)
 
     # run loop
     event = ''
@@ -221,11 +232,15 @@ def simple_gui(debug=False):
             iteration_index = graph_data.get_iteration_index_with_most_failures()
             num_steps = graph_data.get_num_steps(
                 iteration_index)
+            num_iterations = graph_data.get_num_iterations()
+            update_sim_text(window, iteration_index, num_iterations)
             update_step_text(window, simStep, num_steps)
+            simulation_select.display_iterations(
+                window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
             #     state_matrix, initial_failures, MPC_PATH)
             # draw_figure(window[FIGURE].TKCanvas, fig)
-            fig.canvas.draw()
+            redrawFigure = True
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
@@ -258,6 +273,7 @@ def simple_gui(debug=False):
             iteration_index = values[simulation_select.ITERATION_SELECTION_LIST][0]
             num_steps = graph_data.get_num_steps(
                 iteration_index)
+            update_sim_text(window, iteration_index, num_iterations)
             simStep = 0
             redrawFigure = True
 
