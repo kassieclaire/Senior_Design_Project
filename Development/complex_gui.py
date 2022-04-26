@@ -40,9 +40,11 @@ description = " This is a Graphical User Interface \n for the SACE lab's cascadi
 tooltip_iterations = "The number of iterations to run the simulation for. \n" + \
     "Higher numbers of iterations will take longer, but will produce more reliable results."
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
+    "The load-generation ratio is the load on the grid as a percentage of its rated capacity. \n" + \
     "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
     "and 0.0 represents no load"
 operator_constraints_tooltip = "This represents the constraints to which grid operators are held when making load-shedding decisions. \n" + \
+    "Load-shedding is when a grid operator reduces or turns off electricity distribution to an area when the demand is larger than a power source can supply. \n" + \
     "0.0 represents no load-shedding constraints, while 1.0 represents no load-shedding allowed"
 error_tooltip = "This represents the estimation error operators have when determining the highest capacity of a line. \n" + \
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
