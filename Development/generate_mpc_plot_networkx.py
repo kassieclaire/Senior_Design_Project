@@ -98,7 +98,7 @@ class TopologyIterationData:
         _, _, later_failures = self.get_iteration_start_end_steps(
             iteration_index)
         init_failures = len(self.get_initial_failures()[iteration_index])
-        return init_failures + later_failures
+        return init_failures + later_failures - 1
 
 
 def load_mpc(path: str):
