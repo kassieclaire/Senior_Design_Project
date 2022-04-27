@@ -302,7 +302,8 @@ def simple_gui(debug=False):
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
 
         elif event == simulation_select.ITERATION_SELECTION_LIST:
-            iteration_index = values[simulation_select.ITERATION_SELECTION_LIST][0]
+            iteration_index = values[simulation_select.ITERATION_SELECTION_LIST][0].get_iteration_index(
+            )
             num_steps = graph_data.get_num_steps(
                 iteration_index)
             update_sim_text(window, iteration_index, num_iterations)

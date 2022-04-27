@@ -1,4 +1,5 @@
 
+from generate_mpc_plot_networkx import TopologyIterationData
 import load_sim_data
 import PySimpleGUI as sg
 import gui_utilities
@@ -13,13 +14,28 @@ ITERATION_SELECTION_LIST = 'selection_list'
 UPDATE_FILTERS_BUTTON = 'update_filters_button'
 
 
+class SimulationListing():
+    def __init__(self, graph_data: TopologyIterationData, iteration_index: int) -> None:
+        self.iteration_index = iteration_index
+        self.numDigits = len(str(graph_data.get_num_iterations()))
+        self.num_line_failures = graph_data.get_total_failures_at_iteration(
+            iteration_index)
+
+    def __str__(self) -> str:
+        formatString = f'Simulation {{:{self.numDigits}d}}, failures: {{}}'
+        return formatString.format(self.iteration_index, self.num_line_failures)
+
+    def get_iteration_index(self) -> int:
+        return self.iteration_index
+
+
 def getGUIElement():
     layout = sg.Column([[gui_utilities.make_slider_with_frame('Minimum Line Failures', SLIDER_MIN_LINE_FAILURES, range=(0, 100), resolution=1)],
                         [gui_utilities.make_slider_with_frame(
                             'Maximum Line Failures', SLIDER_MAX_LINE_FAILURES, range=(0, 100), resolution=1, default_value=100)],
                         [sg.Button('Update Filters',
                                    key=UPDATE_FILTERS_BUTTON, enable_events=True, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                        [sg.Listbox(values=[], key=ITERATION_SELECTION_LIST, enable_events=True, size=(15, 10))]])
+                        [sg.Listbox(values=[], key=ITERATION_SELECTION_LIST, enable_events=True, size=(24, 10))]])
     return layout
 
 
@@ -43,7 +59,7 @@ def filter_iterations(graph_data: generate_mpc_plot_networkx.TopologyIterationDa
         iteration_indices = range(graph_data.get_num_iterations())
 
     validRange = range(min_line_failures, max_line_failures + 1)
-    filtered_iterations = [i for i in
+    filtered_iterations = [SimulationListing(graph_data, i) for i in
                            iteration_indices if graph_data.get_total_failures_at_iteration(i) in validRange]
     return filtered_iterations
 
