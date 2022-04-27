@@ -85,6 +85,21 @@ class TopologyIterationData:
         _, _, steps = self.get_iteration_start_end_steps(interation_index)
         return steps
 
+    def get_num_iterations(self) -> int:
+        return len(self.sim_end_indices)
+
+    def get_state_matrix(self) -> pd.DataFrame:
+        return self.state_matrix
+
+    def get_initial_failures(self) -> 'list[list[int]]':
+        return self.initial_failures
+
+    def get_total_failures_at_iteration(self, iteration_index) -> int:
+        _, _, later_failures = self.get_iteration_start_end_steps(
+            iteration_index)
+        init_failures = len(self.get_initial_failures()[iteration_index])
+        return init_failures + later_failures - 1
+
 
 def load_mpc(path: str):
     mpc_matrix = scipy.io.loadmat(MPC_PATH)
@@ -187,6 +202,8 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulatio
             g, pos=nx.get_node_attributes(g, 'pos'), ax=axes, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
+
+
 def plot_network_update(mpc_branch_dataframe, initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index, bus_labels: bool = True, branch_labels: bool = False, axes=None, fig=None):
     failure_indix_arr = get_failure_array_at_iteration(
         initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index)
@@ -210,6 +227,7 @@ def plot_network_update(mpc_branch_dataframe, initial_failures, state_matrix, si
             g, ax=axes, pos=pos, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
+
 
 def increment_if_result_in_range(val: Num, increment_val: Num, rng: range) -> Num:
     return val + increment_val if val + increment_val in rng else val

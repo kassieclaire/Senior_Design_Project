@@ -20,13 +20,17 @@ import tkinter as tk
 from tkinter import filedialog
 import shutil
 import gui_utilities
+from gui_utilities import FONT, TEXT_COLOR, BACKGROUND_COLOR
+import simulation_select
+import time
 
 
 # color and size specifications
-TEXT_COLOR = '#000000'
-BACKGROUND_COLOR = '#FFFFFF'
+
 INPUT_BOX_SIZE = (25, 1)
 INPUT_FRAME_SIZE = (300, 60)
+ANIMATE_TOPOLOGY_DELAY = 0.5
+
 # slider keys
 TEXT_BOX_ITERATIONS = 'text_box_iterations'
 SLIDER_ITERATIONS = 'iterations'
@@ -43,6 +47,10 @@ FIGURE = 'figure_1'
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
+ANIMATE_BUTTON_KEY = 'Animate Button'
+ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
+SIM_TEXT_KEY = 'sim_text'
+SIM_TEXT_FORMAT = 'Simulation %d out of %d'
 STEP_TEXT_KEY = 'step_text'
 STEP_TEXT_FORMAT = 'Step %d of %d'
 # descriptions and tooltips
@@ -74,6 +82,13 @@ def update_step_text(window, simStep, numIterations):
     """
     window[STEP_TEXT_KEY].update(STEP_TEXT_FORMAT %
                                  (simStep, numIterations - 1))
+
+
+def update_sim_text(window, iteration, numIterations):
+    """
+    Updates the simulation text to show the current iteration of the simulation
+    """
+    window[SIM_TEXT_KEY].update(SIM_TEXT_FORMAT % (iteration, numIterations))
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -125,9 +140,12 @@ def simple_gui(debug=False):
                         'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
+                     [sg.Text('', key=SIM_TEXT_KEY)],
                      [sg.Text('', key=STEP_TEXT_KEY)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Button('Play', key=ANIMATE_BUTTON_KEY, button_color=(
+                         TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(SAVE_BUTTON, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
@@ -144,7 +162,9 @@ def simple_gui(debug=False):
               [sg.Text('Cascading failure Simulator GUI',
                        background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
-               sg.Column(output_column, key=COLUMN_OUTPUT, element_justification='c', background_color=BACKGROUND_COLOR)]]
+               sg.Column(output_column, key=COLUMN_OUTPUT,
+                         element_justification='c', background_color=BACKGROUND_COLOR),
+               simulation_select.getGUIElement()]]
 
     # create the window with the layout
     window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
@@ -164,19 +184,26 @@ def simple_gui(debug=False):
     #     state_matrix)
     # mostFailureSimIndex = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
     #     negativeOneIndices)
-    numIterations = graph_data.get_num_steps(
-        graph_data.get_iteration_index_with_most_failures())
-    # _, _, numIterations = generate_mpc_plot_networkx.get_simulation_start_end_iterations(
-    #     negativeOneIndices, mostFailureSimIndex)
+    iteration_index = graph_data.get_iteration_index_with_most_failures()
+    num_steps = graph_data.get_num_steps(
+        iteration_index)
+    num_iterations = graph_data.get_num_iterations()
+
     simStep = 0
+    animateTopology = False
     fig = graph_data.plot_topology(
-        graph_data.get_iteration_index_with_most_failures(), simStep)
+        iteration_index, simStep)
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
     #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
-    disable_forward_back_buttons(window, simStep, numIterations)
-    update_step_text(window, simStep, numIterations)
+    disable_forward_back_buttons(window, simStep, num_steps)
+    update_step_text(window, simStep, num_steps)
+
+    # TODO change this hardcoded value
+    simulation_select.display_iterations(
+        window, graph_data, 0, 3000)
+    update_sim_text(window, iteration_index, num_iterations)
 
     # run loop
     event = ''
@@ -212,35 +239,79 @@ def simple_gui(debug=False):
             #                                                                                                           load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
             graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
                                                        load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-            numIterations = graph_data.get_num_steps(
-                graph_data.get_iteration_index_with_most_failures())
-            update_step_text(window, simStep, numIterations)
+            iteration_index = graph_data.get_iteration_index_with_most_failures()
+            num_steps = graph_data.get_num_steps(
+                iteration_index)
+            num_iterations = graph_data.get_num_iterations()
+            update_sim_text(window, iteration_index, num_iterations)
+            update_step_text(window, simStep, num_steps)
+            simulation_select.display_iterations(
+                window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
             #     state_matrix, initial_failures, MPC_PATH)
             # draw_figure(window[FIGURE].TKCanvas, fig)
-            fig.canvas.draw()
+            redrawFigure = True
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)
             redrawFigure = True
             simStep = 0
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Last':
             print(event)
             redrawFigure = True
-
-            simStep = numIterations - 1
+            simStep = num_steps - 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Forward':
             print(event)
             redrawFigure = True
-
             simStep += 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Back':
             print(event)
             redrawFigure = True
             simStep -= 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
+
+        elif animateTopology and event == ANIMATE_ACTION_TIMER_KEY:
+            print(event)
+            redrawFigure = True
+            simStep += 1
+            window.perform_long_operation(lambda: time.sleep(
+                ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
+
+        elif event == ANIMATE_BUTTON_KEY:
+            # it animateTopology is false, start animation
+            if not animateTopology:
+                animateTopology = True
+                window.perform_long_operation(lambda: time.sleep(
+                    ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
+                window[ANIMATE_BUTTON_KEY].update(text='Pause')
+            else:
+                animateTopology = False
+                window[ANIMATE_BUTTON_KEY].update(text='Play')
+
+            # elif event == simulation_select.SLIDER_MIN_LINE_FAILURES or event == simulation_select.SLIDER_MAX_LINE_FAILURES:
+        elif event == simulation_select.UPDATE_FILTERS_BUTTON:
+            simulation_select.display_iterations(
+                window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
+
+        elif event == simulation_select.ITERATION_SELECTION_LIST:
+            iteration_index = values[simulation_select.ITERATION_SELECTION_LIST][0].get_iteration_index(
+            )
+            num_steps = graph_data.get_num_steps(
+                iteration_index)
+            update_sim_text(window, iteration_index, num_iterations)
+            simStep = 0
+            redrawFigure = True
+
         elif event == 'More Options':
             # if user selects more options, then return the action more options
             window.close()
@@ -261,7 +332,8 @@ def simple_gui(debug=False):
             # saves figure currently displayed
             root = tk.Tk()
             root.withdraw()
-            file = filedialog.asksaveasfilename(filetypes=(("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
+            file = filedialog.asksaveasfilename(filetypes=(
+                ("png", "*.png"), ("jpeg", "*.jpeg"), ("pdf", "*.pdf"), ("svg", "*.svg")), defaultextension=(("png", "*.png")))
             if file:
                 plt.savefig(file, dpi=450)
 
@@ -306,18 +378,20 @@ def simple_gui(debug=False):
         # check the bounds on the simulation iteration
         if simStep < 0:
             simStep = 0
-        elif simStep >= numIterations:
-            simStep = numIterations - 1
+        elif simStep >= num_steps:
+            simStep = num_steps - 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
         # redraw the figure if the iteration has changed
         if redrawFigure:
-            update_step_text(window, simStep, numIterations)
+            update_step_text(window, simStep, num_steps)
             fig.clear()
             fig = graph_data.plot_topology(
-                graph_data.get_iteration_index_with_most_failures(), simStep, fig=fig)
+                iteration_index, simStep, fig=fig)
             fig.canvas.draw()
             redrawFigure = False
         # disable first and last buttons if at the beginning or end of the simulation
-        disable_forward_back_buttons(window, simStep, numIterations)
+        disable_forward_back_buttons(window, simStep, num_steps)
 
     window.close()
     # quit application
