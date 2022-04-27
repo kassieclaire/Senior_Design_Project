@@ -22,12 +22,15 @@ import shutil
 import gui_utilities
 from gui_utilities import FONT, TEXT_COLOR, BACKGROUND_COLOR
 import simulation_select
+import time
 
 
 # color and size specifications
 
 INPUT_BOX_SIZE = (25, 1)
 INPUT_FRAME_SIZE = (300, 60)
+ANIMATE_TOPOLOGY_DELAY = 0.5
+
 # slider keys
 TEXT_BOX_ITERATIONS = 'text_box_iterations'
 SLIDER_ITERATIONS = 'iterations'
@@ -44,6 +47,8 @@ FIGURE = 'figure_1'
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
+ANIMATE_BUTTON_KEY = 'Animate Button'
+ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
 SIM_TEXT_KEY = 'sim_text'
 SIM_TEXT_FORMAT = 'Simulation %d out of %d'
 STEP_TEXT_KEY = 'step_text'
@@ -137,6 +142,8 @@ def simple_gui(debug=False):
                      [sg.Text('', key=STEP_TEXT_KEY)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Button('Play', key=ANIMATE_BUTTON_KEY, button_color=(
+                         TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(SAVE_BUTTON, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
@@ -181,6 +188,7 @@ def simple_gui(debug=False):
     num_iterations = graph_data.get_num_iterations()
 
     simStep = 0
+    animateTopology = False
     fig = graph_data.plot_topology(
         iteration_index, simStep)
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
@@ -246,25 +254,49 @@ def simple_gui(debug=False):
             print(event)
             redrawFigure = True
             simStep = 0
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Last':
             print(event)
             redrawFigure = True
-
             simStep = num_steps - 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Forward':
             print(event)
             redrawFigure = True
-
             simStep += 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
         elif event == 'Back':
             print(event)
             redrawFigure = True
             simStep -= 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
 
-        # elif event == simulation_select.SLIDER_MIN_LINE_FAILURES or event == simulation_select.SLIDER_MAX_LINE_FAILURES:
+        elif animateTopology and event == ANIMATE_ACTION_TIMER_KEY:
+            print(event)
+            redrawFigure = True
+            simStep += 1
+            window.perform_long_operation(lambda: time.sleep(
+                ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
+
+        elif event == ANIMATE_BUTTON_KEY:
+            # it animateTopology is false, start animation
+            if not animateTopology:
+                animateTopology = True
+                window.perform_long_operation(lambda: time.sleep(
+                    ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
+                window[ANIMATE_BUTTON_KEY].update(text='Pause')
+            else:
+                animateTopology = False
+                window[ANIMATE_BUTTON_KEY].update(text='Play')
+
+            # elif event == simulation_select.SLIDER_MIN_LINE_FAILURES or event == simulation_select.SLIDER_MAX_LINE_FAILURES:
         elif event == simulation_select.UPDATE_FILTERS_BUTTON:
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
@@ -345,6 +377,8 @@ def simple_gui(debug=False):
             simStep = 0
         elif simStep >= num_steps:
             simStep = num_steps - 1
+            animateTopology = False
+            window[ANIMATE_BUTTON_KEY].update(text='Play')
         # redraw the figure if the iteration has changed
         if redrawFigure:
             update_step_text(window, simStep, num_steps)
