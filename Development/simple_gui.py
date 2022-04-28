@@ -23,13 +23,13 @@ import gui_utilities
 from gui_utilities import FONT, TEXT_COLOR, BACKGROUND_COLOR
 import simulation_select
 import time
+import sim_connect
 
 
 # color and size specifications
 
 INPUT_BOX_SIZE = (25, 1)
 INPUT_FRAME_SIZE = (300, 60)
-ANIMATE_TOPOLOGY_DELAY = 0.5
 
 # slider keys
 TEXT_BOX_ITERATIONS = 'text_box_iterations'
@@ -49,6 +49,11 @@ COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
 ANIMATE_BUTTON_KEY = 'Animate Button'
 ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
+ANIMATE_TOPOLOGY_DELAY = 0.5
+
+SIMULATION_COMPLETE_ACTION = 'simulation_complete'
+SIMULATION_LOADED_ACTION = 'simulation_loaded'
+
 SIM_TEXT_KEY = 'sim_text'
 SIM_TEXT_FORMAT = 'Simulation %d out of %d'
 STEP_TEXT_KEY = 'step_text'
@@ -188,6 +193,7 @@ def simple_gui(debug=False):
     num_steps = graph_data.get_num_steps(
         iteration_index)
     num_iterations = graph_data.get_num_iterations()
+    simulation_obj: sim_connect.Simulation = None
 
     simStep = 0
     animateTopology = False
@@ -232,13 +238,46 @@ def simple_gui(debug=False):
             load_shed_constant = values[SLIDER_LOAD_SHED_CONST]
             estimation_error = values[SLIDER_CAPACITY_ESTIMATION_ERROR]
             # info on figure update
-            fig.clear()
+            # fig.clear()
             # TODO: Give this its own thread and some sort of mutex lock as well
-            simStep = 0
+            # simStep = 0
             # (initial_failures, state_matrix, negativeOneIndices, mostFailureSimIndex, fig) = simple_run_button_action(fig, case_name, iterations, initial_failures,
             #                                                                                                           load_generation_ratio, load_shed_constant, estimation_error, batch_size, branch_data)
-            graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
-                                                       load_generation_ratio, load_shed_constant, estimation_error, batch_size)
+            # graph_data, fig = simple_run_button_action(fig, case_name, iterations, initial_failures,
+            #                                            load_generation_ratio, load_shed_constant, estimation_error, batch_size)
+            simulation_obj = sim_connect.Simulation(
+                case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size)
+
+            print("Running simulation...")
+            window.perform_long_operation(
+                simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
+
+            # TODO run the simulation in a separate thread
+
+            # iteration_index = graph_data.get_iteration_index_with_most_failures()
+            # num_steps = graph_data.get_num_steps(
+            #     iteration_index)
+            # num_iterations = graph_data.get_num_iterations()
+            # update_sim_text(window, iteration_index, num_iterations)
+            # update_step_text(window, simStep, num_steps)
+            # simulation_select.display_iterations(
+            #     window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
+            # # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+            # #     state_matrix, initial_failures, MPC_PATH)
+            # # draw_figure(window[FIGURE].TKCanvas, fig)
+            # redrawFigure = True
+
+        elif event == SIMULATION_COMPLETE_ACTION:
+            print('Simulation complete!')
+            print('Loading simulation data...')
+            window.perform_long_operation(
+                simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
+
+        elif event == SIMULATION_LOADED_ACTION:
+            print('Simulation loaded!')
+            simStep = 0
+            graph_data = generate_mpc_plot_networkx.TopologyIterationData(
+                simulation_obj.get_states_dataframe(), simulation_obj.get_initial_failure_array(), case_name=case_name)
             iteration_index = graph_data.get_iteration_index_with_most_failures()
             num_steps = graph_data.get_num_steps(
                 iteration_index)
@@ -247,10 +286,8 @@ def simple_gui(debug=False):
             update_step_text(window, simStep, num_steps)
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
-            # graph_data = generate_mpc_plot_networkx.TopologyIterationData(
-            #     state_matrix, initial_failures, MPC_PATH)
-            # draw_figure(window[FIGURE].TKCanvas, fig)
             redrawFigure = True
+
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
             print(event)

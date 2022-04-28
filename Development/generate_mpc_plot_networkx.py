@@ -19,7 +19,9 @@ SEED = 42
 
 
 class TopologyIterationData:
-    def __init__(self, state_matrix, initial_failures, mpc_path):
+    def __init__(self, state_matrix, initial_failures, mpc_path=None, case_name=None):
+        if mpc_path is None:
+            mpc_path = f'{case_name}_mpc_presim.mat'
         mpc = load_mpc(mpc_path)
         self.branch_dataframe = get_branch_dataframe(mpc)
         self.state_matrix = state_matrix
