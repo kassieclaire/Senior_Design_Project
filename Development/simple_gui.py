@@ -417,12 +417,12 @@ def simple_gui(debug=False):
                 'LOAD: This is the load-generation ratio for the grid. The load-generation ratio is the load on ' +
                 'the grid as a percentage of its rated capacity. 1.0 represents the sum of the loads being equivalant' +
                 'to the max generation capacity and 0.0 represents no load',
-                'OPERATOR CONSTRAINTS: This represents the constraints to which grid operators are held when making load-shedding decisions.' + 
+                'OPERATOR CONSTRAINTS: This represents the constraints to which grid operators are held when making load-shedding decisions.' +
                 'Load-shedding is when a grid operator reduces or turns off electricity distribution to an area when the' +
                 'demand is larger than a power source can supply. 0.0 represents no load-shedding constraints, while' +
                 '1.0 represents no load-shedding allowed',
                 'ERROR: This represents the estimation error operators have when determining the highest capacity of a line.' +
-                '0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities', 
+                '0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities',
                 'INITIAL FAILURES: This is the number of random line failures that occur at the start of the simulation.')
 
         elif event == 'Outputs':
@@ -435,6 +435,8 @@ def simple_gui(debug=False):
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
+            # kill the simulation, if running
+            simulation_obj.kill_simulation()
             break
 
         # check the bounds on the simulation iteration

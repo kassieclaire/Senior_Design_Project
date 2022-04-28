@@ -5,6 +5,10 @@ import sys
 import subprocess
 from unittest import case
 from load_sim_data import load_initial_failures
+import time
+import re
+from threading import Timer
+from subprocess import TimeoutExpired
 
 # defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
@@ -52,6 +56,7 @@ class Simulation:
         self.batch_size = batch_size
         self.output_name = self.__generate_output_name(
             case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
+        self.__kill_simulation = False
         self.state_matrix = None
         self.initial_failure_array = None
         # if the simulation files exist, mark the simulation as complete (but not loaded), otherwise mark it as not run
@@ -101,6 +106,9 @@ class Simulation:
         else:
             return None
 
+    def kill_simulation(self):
+        self.__kill_simulation = True
+
     def __get_argument_array(self):
         return [self.case_name, str(self.iterations), str(self.initial_failures), str(self.load_generation_ratio), str(self.load_shed_constant), str(self.estimation_error), self.output_name, str(self.batch_size)]
 
@@ -113,16 +121,20 @@ class Simulation:
             return
         self.status = SimulationStatus.RUNNING
         self.fraction_complete = 0.0
+        self.__kill_simulation = False
         # call the matlab executable
         argString = " ".join(self.__get_argument_array())
+        process = None
         # argString = f"{self.case_name} {self.iterations} {self.initial_failures} {self.load_generation_ratio} {self.load_shed_constant} {self.estimation_error} {self.output_name} {self.batch_size}"
         if sys.platform == "win32":
             # TODO add a warning if the runtime is not installed
             print(argString)
             # TODO run the simulation as a subprocess
             #subprocess.run([windows_executable, arguments])
-            os.system(f"{windows_executable} {argString}")
-            # return output_name
+            # os.system(f"{windows_executable} {argString}")
+            process = subprocess.Popen(
+                [windows_executable] + self.__get_argument_array(), stdout=subprocess.PIPE)
+
         elif sys.platform == "linux" or sys.platform == "linux2":
             # TODO add a warning if the runtime is not installed
             print("Work on Linux platform still in progress.")
@@ -147,6 +159,39 @@ class Simulation:
             print("Unknown platform: ", sys.platform)
             return
 
+        # wait for the simulation to finish
+        while process.poll() is None:
+            # print('Process is running...')
+            timer = Timer(interval=1, function=lambda: None)
+            try:
+                timer.start()
+                # process_output, stderr = process.communicate(timeout=1)
+                # process_output = process_output.decode().replace('\r', '').split('\n')
+                process_output = process.stdout.readline().decode().replace('\r',
+                                                                            '').replace('\n', '')
+                timer.cancel()
+                # process_output = process.stdout.read().decode().replace('\r',
+                #                                                         '').replace('\n', '')
+                # print('Output: ', process_output)
+                # if the output indicates a new batch is started, update the fraction complete
+                # for line in process_output:
+                if process_output.startswith('Starting simulations from starting index'):
+                    startIndex, endIndex = [
+                        int(x) for x in re.findall(r'\d+', process_output)]
+                    self.fraction_complete = startIndex / self.iterations
+                    print(self.fraction_complete)
+            finally:
+                # print('timeout occured')
+                timer.cancel()
+                pass
+            # if simulation kill is requested, kill the process, set completion levels to 0 and return
+            if self.__kill_simulation:
+                process.kill()
+                self.fraction_complete = 0.0
+                self.__kill_simulation = False
+                self.status = SimulationStatus.NOT_RUN
+                return
+            time.sleep(1)
         self.status = SimulationStatus.COMPLETE
         self.fraction_complete = 1.0
 
