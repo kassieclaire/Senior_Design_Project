@@ -50,6 +50,8 @@ SAVE_BUTTON = 'Save Image'
 ANIMATE_BUTTON_KEY = 'Animate Button'
 ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
 ANIMATE_TOPOLOGY_DELAY = 0.5
+PROGRESS_BAR_KEY = 'progress_bar'
+PROGRESS_BAR_TIMER_KEY = 'progress_bar_timer'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
@@ -143,7 +145,9 @@ def simple_gui(debug=False):
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
-                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
+                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                    [sg.ProgressBar(key=PROGRESS_BAR_KEY,
+                                    orientation='horizontal', max_value=100, size=(25, 20))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
                      [sg.Text('', key=SIM_TEXT_KEY)],
@@ -219,8 +223,8 @@ def simple_gui(debug=False):
 
     while True:
         event, values = window.read()
-        print(event)
-        print(values)
+        # print(event)
+        # print(values)
         if event == 'Run':
             print('the "run" button has been pressed!')
             case_name = 'case118'
@@ -252,6 +256,8 @@ def simple_gui(debug=False):
             print("Running simulation...")
             window.perform_long_operation(
                 simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
+            window.perform_long_operation(
+                lambda: time.sleep(1), PROGRESS_BAR_TIMER_KEY)
 
             # TODO run the simulation in a separate thread
 
@@ -288,6 +294,14 @@ def simple_gui(debug=False):
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             redrawFigure = True
+
+        elif event == PROGRESS_BAR_TIMER_KEY:
+            # print('Progress bar timer fired!')
+            window[PROGRESS_BAR_KEY].UpdateBar(
+                int(simulation_obj.get_fraction_complete() * 100))
+            if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
+                window.perform_long_operation(
+                    lambda: time.sleep(1), PROGRESS_BAR_TIMER_KEY)
 
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
