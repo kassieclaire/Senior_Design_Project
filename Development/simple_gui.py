@@ -163,7 +163,7 @@ def simple_gui(debug=False):
                      ]
     # full layout
     layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
-              [sg.Text('Cascading failure Simulator GUI',
+              [sg.Text('Cascading failure Simulator',
                        background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.Column(output_column, key=COLUMN_OUTPUT,
@@ -171,7 +171,7 @@ def simple_gui(debug=False):
                simulation_select.getGUIElement()]]
 
     # create the window with the layout
-    window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
+    window = sg.Window('Cascading Failure Simulator',
                        layout, finalize=True, element_justification='center', font=gui_utilities.FONT, background_color=BACKGROUND_COLOR)
     # add the plot to the window
     # fig = draw_plot()
