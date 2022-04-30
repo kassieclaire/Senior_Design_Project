@@ -29,42 +29,43 @@ from sim_connect import SimulationStatus
 
 # color and size specifications
 
-INPUT_BOX_SIZE = (25, 1)
-INPUT_FRAME_SIZE = (300, 60)
+SIZE_INPUT_BOX = (24, 1)
+SIZE_SLIDER = (20, 20)
+SIZE_INPUT_FRAME = (300, 60)
 
 # slider keys
-TEXT_BOX_ITERATIONS = 'text_box_iterations'
-SLIDER_ITERATIONS = 'iterations'
-SLIDER_LOAD = 'slider_load'
-SLIDER_INITIAL_FAILURES = 'slider_init_failures'
-SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
-SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
+KEY_INPUT_BOX_ITERATIONS = 'text_box_iterations'
+KEY_SLIDER_LOAD = 'slider_load'
+KEY_SLIDER_INITIAL_FAILURES = 'slider_init_failures'
+KEY_SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
+KEY_SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
 MPC_PATH = 'case118_mpc_presim.mat'
-SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
-SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
+PATH_SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
+PATH_SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
 # Figure keys
-FIGURE = 'figure_1'
+KEY_FIGURE = 'figure_1'
 # column keys
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
-SAVE_BUTTON = 'Save Image'
-ANIMATE_BUTTON_KEY = 'Animate Button'
-ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
-KEY_BUTTON_RUN = 'Run'
-KEY_BUTTON_CANCEL = 'Cancel'
+LABEL_BUTTON_SAVE = 'Save Image'
+KEY_BUTTON_SAVE = 'save_button'
+KEY_BUTTON_ANIMATE = 'animate_button'
+KEY_TIMER_ANIMATE = 'animate_action_timer'
+KEY_BUTTON_SIM_RUN = 'Run'
+KEY_BUTTON_SIM_CANCEL = 'Cancel'
 ANIMATE_TOPOLOGY_DELAY = 0.5
-PROGRESS_BAR_KEY = 'progress_bar'
-PROGRESS_BAR_TIMER_KEY = 'progress_bar_timer'
+KEY_PROGRESS_BAR = 'progress_bar'
+KEY_TIMER_PROGRESS_BAR = 'progress_bar_timer'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
 
-SIM_TEXT_KEY = 'sim_text'
-SIM_TEXT_FORMAT = 'Simulation %d out of %d'
-STEP_TEXT_KEY = 'step_text'
-STEP_TEXT_FORMAT = 'Step %d of %d'
-TEXT_KEY_SIM_STATUS = 'sim_status'
-TEXT_FORMAT_SIM_STATUS = '%s'
+KEY_TEXT_SELECTED_SIM = 'sim_text'
+FORMAT_TEXT_SELECTED_SIM = 'Simulation %d out of %d'
+KEY_TEXT_SIM_STEP = 'step_text'
+FORMAT_TEXT_SIM_STEP = 'Step %d of %d'
+KEY_TEXT_SIM_STATUS = 'sim_status'
+FORMAT_TEXT_SIM_STATUS = '%s'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -120,37 +121,37 @@ def simple_gui(debug=False):
 
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                    [sg.Frame('Iterations', [[sg.InputText(key=TEXT_BOX_ITERATIONS, tooltip=tooltip_iterations,
-                                                           size=INPUT_BOX_SIZE)]], border_width=10, relief='flat')],
+                    [sg.Frame('Iterations', [[sg.InputText(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+                                                           size=SIZE_INPUT_BOX)]], border_width=10, relief='flat')],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Load', key=SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05)],
+                        label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Initial Line Failures', key=SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1)],
+                        label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Operator Constraints', key=SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05)],
+                        label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
+                        label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
-                        sg.Button('Run', key=KEY_BUTTON_RUN, button_color=(
+                        sg.Button('Run', key=KEY_BUTTON_SIM_RUN, button_color=(
                             TEXT_COLOR, BACKGROUND_COLOR)),
-                        sg.Button('Cancel', key=KEY_BUTTON_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                        sg.Button('Cancel', key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
                     [sg.Text('Status:', size=(8, 1)), sg.Text('No simulation running.',
-                                                              key=TEXT_KEY_SIM_STATUS, size=(20, 1))],
-                    [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=PROGRESS_BAR_KEY,
+                                                              key=KEY_TEXT_SIM_STATUS, size=(20, 1))],
+                    [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=KEY_PROGRESS_BAR,
                                                                        orientation='horizontal', max_value=100, size=(20, 20))]
                     ]
-    output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
-                     [sg.Text('', key=SIM_TEXT_KEY)],
-                     [sg.Text('', key=STEP_TEXT_KEY)],
+    output_column = [[sg.pin(sg.Canvas(key=KEY_FIGURE))],
+                     [sg.Text('', key=KEY_TEXT_SELECTED_SIM)],
+                     [sg.Text('', key=KEY_TEXT_SIM_STEP)],
                      [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
                          'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Button('Play', key=ANIMATE_BUTTON_KEY, button_color=(
+                     [sg.Button('Play', key=KEY_BUTTON_ANIMATE, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Button(SAVE_BUTTON, button_color=(
+                     [sg.Button(LABEL_BUTTON_SAVE, key=KEY_BUTTON_SAVE, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
                          str(delivery_loss_percent) + "%")],
@@ -177,9 +178,9 @@ def simple_gui(debug=False):
     # fig = draw_plot()
 
     # load mpc plotting data
-    state_matrix = load_sim_data.load_state_matrix(SIM_STATE_MATRIX)
+    state_matrix = load_sim_data.load_state_matrix(PATH_SIM_STATE_MATRIX)
     initial_failures = load_sim_data.load_initial_failures(
-        SIM_INITIAL_FAILURES)
+        PATH_SIM_INITIAL_FAILURES)
     graph_data = generate_mpc_plot_networkx.TopologyIterationData(
         state_matrix, initial_failures, MPC_PATH)
     # branch_data = generate_mpc_plot_networkx.get_branch_dataframe(
@@ -201,17 +202,17 @@ def simple_gui(debug=False):
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
     #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
-    fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
+    fig_canvas_agg = draw_figure(window[KEY_FIGURE].TKCanvas, fig)
     disable_forward_back_buttons(window, simStep, num_steps)
     # update_step_text(window, simStep, num_steps)
-    gui_utilities.update_text(window, STEP_TEXT_KEY,
-                              STEP_TEXT_FORMAT, (simStep, num_steps - 1))
+    gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
+                              FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
 
     # TODO change this hardcoded value
     simulation_select.display_iterations(
         window, graph_data, 0, 3000)
-    gui_utilities.update_text(window, SIM_TEXT_KEY,
-                              SIM_TEXT_FORMAT, (iteration_index, num_iterations))
+    gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
+                              FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
 
     # run loop
     event = ''
@@ -222,23 +223,23 @@ def simple_gui(debug=False):
         event, values = window.read()
         # print(event)
         # print(values)
-        if event == KEY_BUTTON_RUN:
+        if event == KEY_BUTTON_SIM_RUN:
             print('the "run" button has been pressed!')
             case_name = 'case118'
             iterations = 100000  # TODO: Make this an input
             try:
-                iterations = int(values[TEXT_BOX_ITERATIONS])
+                iterations = int(values[KEY_INPUT_BOX_ITERATIONS])
             except ValueError:
                 print(
                     f'Invalid input for iterations. Using default value of {iterations}')
-                print(type(window[TEXT_BOX_ITERATIONS]))
-                window[TEXT_BOX_ITERATIONS].Update(str(iterations))
+                print(type(window[KEY_INPUT_BOX_ITERATIONS]))
+                window[KEY_INPUT_BOX_ITERATIONS].Update(str(iterations))
                 window.refresh()
             batch_size = 16
-            load_generation_ratio = values[SLIDER_LOAD]
-            initial_failures = int(values[SLIDER_INITIAL_FAILURES])
-            load_shed_constant = values[SLIDER_LOAD_SHED_CONST]
-            estimation_error = values[SLIDER_CAPACITY_ESTIMATION_ERROR]
+            load_generation_ratio = values[KEY_SLIDER_LOAD]
+            initial_failures = int(values[KEY_SLIDER_INITIAL_FAILURES])
+            load_shed_constant = values[KEY_SLIDER_LOAD_SHED_CONST]
+            estimation_error = values[KEY_SLIDER_CAPACITY_ESTIMATION_ERROR]
             # info on figure update
             # fig.clear()
             # TODO: Give this its own thread and some sort of mutex lock as well
@@ -252,11 +253,11 @@ def simple_gui(debug=False):
 
             print("Running simulation...")
             gui_utilities.update_text(
-                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('simulation starting...'))
+                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
             window.perform_long_operation(
                 simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
             window.perform_long_operation(
-                lambda: time.sleep(1), PROGRESS_BAR_TIMER_KEY)
+                lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
 
             # TODO run the simulation in a separate thread
 
@@ -277,7 +278,7 @@ def simple_gui(debug=False):
             print('Simulation complete!')
             print('Loading simulation data...')
             gui_utilities.update_text(
-                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('loading data...'))
+                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
             window.perform_long_operation(
                 simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
 
@@ -285,7 +286,7 @@ def simple_gui(debug=False):
             print('Simulation loaded!')
             simStep = 0
             gui_utilities.update_text(
-                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, (
+                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, (
                     'simulation loaded'))
             graph_data = generate_mpc_plot_networkx.TopologyIterationData(
                 simulation_obj.get_states_dataframe(), simulation_obj.get_initial_failure_array(), case_name=case_name)
@@ -293,28 +294,28 @@ def simple_gui(debug=False):
             num_steps = graph_data.get_num_steps(
                 iteration_index)
             num_iterations = graph_data.get_num_iterations()
-            gui_utilities.update_text(window, SIM_TEXT_KEY,
-                                      SIM_TEXT_FORMAT, (iteration_index, num_iterations))
+            gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
+                                      FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
             # update_step_text(window, simStep, num_steps)
-            gui_utilities.update_text(window, STEP_TEXT_KEY,
-                                      STEP_TEXT_FORMAT, (simStep, num_steps - 1))
+            gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
+                                      FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             redrawFigure = True
 
-        elif event == PROGRESS_BAR_TIMER_KEY:
+        elif event == KEY_TIMER_PROGRESS_BAR:
             # print('Progress bar timer fired!')
             percent_complete = int(
                 simulation_obj.get_fraction_complete() * 100)
-            window[PROGRESS_BAR_KEY].UpdateBar(percent_complete)
+            window[KEY_PROGRESS_BAR].UpdateBar(percent_complete)
             # only change the status to reflect completeness once the first batch starts, and if other completeness items are not present
             if percent_complete > 0.0 and simulation_obj.get_simulation_status() == SimulationStatus.RUNNING:
                 print('updating percentage')
                 gui_utilities.update_text(
-                    window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('%d%% complete' % percent_complete))
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('%d%% complete' % percent_complete))
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
-                    lambda: time.sleep(1), PROGRESS_BAR_TIMER_KEY)
+                    lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
 
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
@@ -322,46 +323,46 @@ def simple_gui(debug=False):
             redrawFigure = True
             simStep = 0
             animateTopology = False
-            window[ANIMATE_BUTTON_KEY].update(text='Play')
+            window[KEY_BUTTON_ANIMATE].update(text='Play')
 
         elif event == 'Last':
             print(event)
             redrawFigure = True
             simStep = num_steps - 1
             animateTopology = False
-            window[ANIMATE_BUTTON_KEY].update(text='Play')
+            window[KEY_BUTTON_ANIMATE].update(text='Play')
 
         elif event == 'Forward':
             print(event)
             redrawFigure = True
             simStep += 1
             animateTopology = False
-            window[ANIMATE_BUTTON_KEY].update(text='Play')
+            window[KEY_BUTTON_ANIMATE].update(text='Play')
 
         elif event == 'Back':
             print(event)
             redrawFigure = True
             simStep -= 1
             animateTopology = False
-            window[ANIMATE_BUTTON_KEY].update(text='Play')
+            window[KEY_BUTTON_ANIMATE].update(text='Play')
 
-        elif animateTopology and event == ANIMATE_ACTION_TIMER_KEY:
+        elif animateTopology and event == KEY_TIMER_ANIMATE:
             print(event)
             redrawFigure = True
             simStep += 1
             window.perform_long_operation(lambda: time.sleep(
-                ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
+                ANIMATE_TOPOLOGY_DELAY), KEY_TIMER_ANIMATE)
 
-        elif event == ANIMATE_BUTTON_KEY:
+        elif event == KEY_BUTTON_ANIMATE:
             # it animateTopology is false, start animation
             if not animateTopology:
                 animateTopology = True
                 window.perform_long_operation(lambda: time.sleep(
-                    ANIMATE_TOPOLOGY_DELAY), ANIMATE_ACTION_TIMER_KEY)
-                window[ANIMATE_BUTTON_KEY].update(text='Pause')
+                    ANIMATE_TOPOLOGY_DELAY), KEY_TIMER_ANIMATE)
+                window[KEY_BUTTON_ANIMATE].update(text='Pause')
             else:
                 animateTopology = False
-                window[ANIMATE_BUTTON_KEY].update(text='Play')
+                window[KEY_BUTTON_ANIMATE].update(text='Play')
 
             # elif event == simulation_select.SLIDER_MIN_LINE_FAILURES or event == simulation_select.SLIDER_MAX_LINE_FAILURES:
         elif event == simulation_select.UPDATE_FILTERS_BUTTON:
@@ -373,8 +374,8 @@ def simple_gui(debug=False):
             )
             num_steps = graph_data.get_num_steps(
                 iteration_index)
-            gui_utilities.update_text(window, SIM_TEXT_KEY,
-                                      SIM_TEXT_FORMAT, (iteration_index, num_iterations))
+            gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
+                                      FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
             simStep = 0
             redrawFigure = True
 
@@ -384,7 +385,7 @@ def simple_gui(debug=False):
             # return the action for more options
             return 'more'
 
-        elif event == SAVE_BUTTON:
+        elif event == KEY_BUTTON_SAVE:
             root = tk.Tk()
             root.withdraw()
             file = filedialog.asksaveasfilename(
@@ -475,12 +476,12 @@ def simple_gui(debug=False):
         elif simStep >= num_steps:
             simStep = num_steps - 1
             animateTopology = False
-            window[ANIMATE_BUTTON_KEY].update(text='Play')
+            window[KEY_BUTTON_ANIMATE].update(text='Play')
         # redraw the figure if the iteration has changed
         if redrawFigure:
             # update_step_text(window, simStep, num_steps)
-            gui_utilities.update_text(window, STEP_TEXT_KEY,
-                                      STEP_TEXT_FORMAT, (simStep, num_steps - 1))
+            gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
+                                      FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             fig.clear()
             fig = graph_data.plot_topology(
                 iteration_index, simStep, fig=fig)
