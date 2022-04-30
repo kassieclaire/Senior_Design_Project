@@ -83,21 +83,6 @@ worst_cluster = 4
 num_lines = 186
 
 
-def update_step_text(window, simStep, numIterations):
-    """
-    Updates the step text to show the current step of the simulation
-    """
-    window[STEP_TEXT_KEY].update(STEP_TEXT_FORMAT %
-                                 (simStep, numIterations - 1))
-
-
-def update_sim_text(window, iteration, numIterations):
-    """
-    Updates the simulation text to show the current iteration of the simulation
-    """
-    window[SIM_TEXT_KEY].update(SIM_TEXT_FORMAT % (iteration, numIterations))
-
-
 def disable_forward_back_buttons(window, simStep, numIterations):
     """
     Disables the iteration control buttons based on whether the iteration is at the start of end of the simulation
@@ -209,12 +194,15 @@ def simple_gui(debug=False):
     # fig = plot_topology()
     fig_canvas_agg = draw_figure(window[FIGURE].TKCanvas, fig)
     disable_forward_back_buttons(window, simStep, num_steps)
-    update_step_text(window, simStep, num_steps)
+    # update_step_text(window, simStep, num_steps)
+    gui_utilities.update_text(window, STEP_TEXT_KEY,
+                              STEP_TEXT_FORMAT, (simStep, num_steps - 1))
 
     # TODO change this hardcoded value
     simulation_select.display_iterations(
         window, graph_data, 0, 3000)
-    update_sim_text(window, iteration_index, num_iterations)
+    gui_utilities.update_text(window, SIM_TEXT_KEY,
+                              SIM_TEXT_FORMAT, (iteration_index, num_iterations))
 
     # run loop
     event = ''
@@ -289,8 +277,11 @@ def simple_gui(debug=False):
             num_steps = graph_data.get_num_steps(
                 iteration_index)
             num_iterations = graph_data.get_num_iterations()
-            update_sim_text(window, iteration_index, num_iterations)
-            update_step_text(window, simStep, num_steps)
+            gui_utilities.update_text(window, SIM_TEXT_KEY,
+                                      SIM_TEXT_FORMAT, (iteration_index, num_iterations))
+            # update_step_text(window, simStep, num_steps)
+            gui_utilities.update_text(window, STEP_TEXT_KEY,
+                                      STEP_TEXT_FORMAT, (simStep, num_steps - 1))
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             redrawFigure = True
@@ -360,7 +351,8 @@ def simple_gui(debug=False):
             )
             num_steps = graph_data.get_num_steps(
                 iteration_index)
-            update_sim_text(window, iteration_index, num_iterations)
+            gui_utilities.update_text(window, SIM_TEXT_KEY,
+                                      SIM_TEXT_FORMAT, (iteration_index, num_iterations))
             simStep = 0
             redrawFigure = True
 
@@ -462,7 +454,9 @@ def simple_gui(debug=False):
             window[ANIMATE_BUTTON_KEY].update(text='Play')
         # redraw the figure if the iteration has changed
         if redrawFigure:
-            update_step_text(window, simStep, num_steps)
+            # update_step_text(window, simStep, num_steps)
+            gui_utilities.update_text(window, STEP_TEXT_KEY,
+                                      STEP_TEXT_FORMAT, (simStep, num_steps - 1))
             fig.clear()
             fig = graph_data.plot_topology(
                 iteration_index, simStep, fig=fig)
