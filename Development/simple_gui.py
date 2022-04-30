@@ -24,6 +24,7 @@ from gui_utilities import FONT, TEXT_COLOR, BACKGROUND_COLOR
 import simulation_select
 import time
 import sim_connect
+from sim_connect import SimulationStatus
 
 
 # color and size specifications
@@ -49,6 +50,8 @@ COLUMN_OUTPUT = 'output_column'
 SAVE_BUTTON = 'Save Image'
 ANIMATE_BUTTON_KEY = 'Animate Button'
 ANIMATE_ACTION_TIMER_KEY = 'animate_action_timer'
+KEY_BUTTON_RUN = 'Run'
+KEY_BUTTON_CANCEL = 'Cancel'
 ANIMATE_TOPOLOGY_DELAY = 0.5
 PROGRESS_BAR_KEY = 'progress_bar'
 PROGRESS_BAR_TIMER_KEY = 'progress_bar_timer'
@@ -60,6 +63,8 @@ SIM_TEXT_KEY = 'sim_text'
 SIM_TEXT_FORMAT = 'Simulation %d out of %d'
 STEP_TEXT_KEY = 'step_text'
 STEP_TEXT_FORMAT = 'Step %d of %d'
+TEXT_KEY_SIM_STATUS = 'sim_status'
+TEXT_FORMAT_SIM_STATUS = '%s'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -129,10 +134,14 @@ def simple_gui(debug=False):
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
-                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
-                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                    [sg.ProgressBar(key=PROGRESS_BAR_KEY,
-                                    orientation='horizontal', max_value=100, size=(25, 20))]
+                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
+                        sg.Button('Run', key=KEY_BUTTON_RUN, button_color=(
+                            TEXT_COLOR, BACKGROUND_COLOR)),
+                        sg.Button('Cancel', key=KEY_BUTTON_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                    [sg.Text('Status:', size=(8, 1)), sg.Text('No simulation running.',
+                                                              key=TEXT_KEY_SIM_STATUS, size=(20, 1))],
+                    [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=PROGRESS_BAR_KEY,
+                                                                       orientation='horizontal', max_value=100, size=(20, 20))]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
                      [sg.Text('', key=SIM_TEXT_KEY)],
@@ -213,7 +222,7 @@ def simple_gui(debug=False):
         event, values = window.read()
         # print(event)
         # print(values)
-        if event == 'Run':
+        if event == KEY_BUTTON_RUN:
             print('the "run" button has been pressed!')
             case_name = 'case118'
             iterations = 100000  # TODO: Make this an input
@@ -242,6 +251,8 @@ def simple_gui(debug=False):
                 case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size)
 
             print("Running simulation...")
+            gui_utilities.update_text(
+                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('simulation starting...'))
             window.perform_long_operation(
                 simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
             window.perform_long_operation(
@@ -265,12 +276,17 @@ def simple_gui(debug=False):
         elif event == SIMULATION_COMPLETE_ACTION:
             print('Simulation complete!')
             print('Loading simulation data...')
+            gui_utilities.update_text(
+                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('loading data...'))
             window.perform_long_operation(
                 simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
 
         elif event == SIMULATION_LOADED_ACTION:
             print('Simulation loaded!')
             simStep = 0
+            gui_utilities.update_text(
+                window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, (
+                    'simulation loaded'))
             graph_data = generate_mpc_plot_networkx.TopologyIterationData(
                 simulation_obj.get_states_dataframe(), simulation_obj.get_initial_failure_array(), case_name=case_name)
             iteration_index = graph_data.get_iteration_index_with_most_failures()
@@ -288,8 +304,14 @@ def simple_gui(debug=False):
 
         elif event == PROGRESS_BAR_TIMER_KEY:
             # print('Progress bar timer fired!')
-            window[PROGRESS_BAR_KEY].UpdateBar(
-                int(simulation_obj.get_fraction_complete() * 100))
+            percent_complete = int(
+                simulation_obj.get_fraction_complete() * 100)
+            window[PROGRESS_BAR_KEY].UpdateBar(percent_complete)
+            # only change the status to reflect completeness once the first batch starts, and if other completeness items are not present
+            if percent_complete > 0.0 and simulation_obj.get_simulation_status() == SimulationStatus.RUNNING:
+                print('updating percentage')
+                gui_utilities.update_text(
+                    window, TEXT_KEY_SIM_STATUS, TEXT_FORMAT_SIM_STATUS, ('%d%% complete' % percent_complete))
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
                     lambda: time.sleep(1), PROGRESS_BAR_TIMER_KEY)
@@ -442,7 +464,9 @@ def simple_gui(debug=False):
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?
         elif event == sg.WIN_CLOSED:
             # kill the simulation, if running
-            simulation_obj.kill_simulation()
+            # will do nothing if not running
+            if simulation_obj is not None:
+                simulation_obj.kill_simulation()
             break
 
         # check the bounds on the simulation iteration
