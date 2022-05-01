@@ -1,7 +1,9 @@
 # function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
-from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action
+import draw_plot
+from draw_plot import draw_figure
+# from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action
 # from plot_topology import plot_topology
 import generate_mpc_plot_networkx
 import load_sim_data
@@ -26,6 +28,7 @@ import time
 import sim_connect
 from sim_connect import SimulationStatus
 import user_facing_text
+import enum
 
 # color and size specifications
 
@@ -56,6 +59,11 @@ KEY_BUTTON_SIM_CANCEL = 'Cancel'
 ANIMATE_TOPOLOGY_DELAY = 0.5
 KEY_PROGRESS_BAR = 'progress_bar'
 KEY_TIMER_PROGRESS_BAR = 'progress_bar_timer'
+GROUP_ID_RADIO_PLOT_TYPE = 'radio_plot_type'
+KEY_RADIO_PSTOP = 'radio_pstop'
+TEXT_RADIO_PSTOP = 'PStop Graph'
+KEY_RAIDO_TOPOLOGY_PLAYTHROUGH = 'radio_topology'
+TEXT_RADIO_TOPOLOGY_PLAYTHROUGH = 'Simulation Playthrough'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
@@ -87,6 +95,11 @@ cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
+
+
+class FigureState(enum.Enum):
+    PSTOP = 1
+    TOPOLOGY = 2
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -154,6 +167,8 @@ def simple_gui(debug=False):
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(LABEL_BUTTON_SAVE, key=KEY_BUTTON_SAVE, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
+                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RAIDO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
                          str(delivery_loss_percent) + "%")],
                      [sg.Text('Max Line Capacity: '),
@@ -198,8 +213,10 @@ def simple_gui(debug=False):
 
     simStep = 0
     animateTopology = False
-    fig = graph_data.plot_topology(
-        iteration_index, simStep)
+    figure_display_state = FigureState.PSTOP
+    # fig = graph_data.plot_topology(
+    #     iteration_index, simStep)
+    fig = plt.figure()
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
     #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
@@ -222,8 +239,8 @@ def simple_gui(debug=False):
 
     while True:
         event, values = window.read()
-        # print(event)
-        # print(values)
+        print(event)
+        print(values)
         if event == KEY_BUTTON_SIM_RUN:
             print('the "run" button has been pressed!')
             case_name = 'case118'
@@ -317,6 +334,14 @@ def simple_gui(debug=False):
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+
+        # handle selection between the chart types
+        elif event == KEY_RADIO_PSTOP:
+            figure_display_state = FigureState.PSTOP
+            redrawFigure = True
+        elif event == KEY_RAIDO_TOPOLOGY_PLAYTHROUGH:
+            figure_display_state = FigureState.TOPOLOGY
+            redrawFigure = True
 
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
@@ -459,6 +484,7 @@ def simple_gui(debug=False):
             # will do nothing if not running
             if simulation_obj is not None:
                 simulation_obj.kill_simulation()
+            # break out of the loop so that the program will close
             break
 
         # check the bounds on the simulation iteration
@@ -466,6 +492,7 @@ def simple_gui(debug=False):
             simStep = 0
         elif simStep >= num_steps:
             simStep = num_steps - 1
+            # if the simulation is playing through failures, stop it, as it has reached the end
             animateTopology = False
             window[KEY_BUTTON_ANIMATE].update(text='Play')
         # redraw the figure if the iteration has changed
@@ -474,8 +501,12 @@ def simple_gui(debug=False):
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
                                       FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             fig.clear()
-            fig = graph_data.plot_topology(
-                iteration_index, simStep, fig=fig)
+            if figure_display_state == FigureState.TOPOLOGY:
+                fig = graph_data.plot_topology(
+                    iteration_index, simStep, fig=fig)
+            elif figure_display_state == FigureState.PSTOP:
+                fig = draw_plot.draw_pstop_curve(
+                    fig, simulation_obj.get_states_dataframe())
             fig.canvas.draw()
             redrawFigure = False
         # disable first and last buttons if at the beginning or end of the simulation
