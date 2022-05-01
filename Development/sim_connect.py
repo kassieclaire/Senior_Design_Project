@@ -12,7 +12,8 @@ from subprocess import TimeoutExpired
 
 # defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
-mac_executable = ""
+mac_executable = "./sim_executable_mac/run_cascading_failure_simulator.sh"
+mac_matlab_loc = "/Applications/MATLAB_R2021b.app"
 linux_executable = "./sim_executable_linux/run_cascading_failure_simulator.sh /usr/local/MATLAB/MATLAB_Runtime/v911/"
 # simulations to run and their settings
 # batch_sizes = [64, 64]
@@ -152,7 +153,9 @@ class Simulation:
             #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
             # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
             print(argString)
-            os.system(f"{mac_executable} {argString}")
+            #create a simulator process and run it
+            process = subprocess.Popen(
+                [mac_executable, mac_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
             # return output_name
             # return 0
         else:
