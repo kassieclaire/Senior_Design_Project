@@ -81,9 +81,8 @@ def simple_run_button_action(fig, case_name, iterations, initial_failures, load_
     TODO update this
     """
     #tempoary fix: create process variable
-    process = 0
-    graph_data = 0
-    fig = 0
+    graph_data = None
+    process = None
     # get branch data
     # step 1: get the name
     name = sim_connect.get_output_name(

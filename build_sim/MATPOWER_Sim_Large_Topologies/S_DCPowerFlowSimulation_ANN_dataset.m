@@ -231,7 +231,8 @@ function [States, result_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC,
     %States(StateCounter,11)=k; % Index of the failed one
    % States(StateCounter,12)=Capacity(k); % Capacity of the failed one
     States(StateCounter,13)=0; % Time of the failure event
-    States(StateCounter,14)=CapSum; % Accumulation of failed capacities
+    %States(StateCounter,14)=CapSum; % Accumulation of failed capacities --
+    %why was this here? It shouldn't have been.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  %%
             moreFailures=1; % Is any failure happened in previous step?
             counter =0;
@@ -277,7 +278,7 @@ function [States, result_mpc] = S_DCPowerFlowSimulation_ANN_dataset(OriginalMPC,
                 end
                 count_steps =count_steps +1;
                 States(StateCounter,18)=generation;
-                 States(StateCounter,14)= TotalShed;
+                 %States(StateCounter,14)= TotalShed; %whyyyyy?
                 States(StateCounter,16)= Demand - TotalShed;
                 
                 

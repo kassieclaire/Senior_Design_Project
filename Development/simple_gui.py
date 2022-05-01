@@ -42,9 +42,11 @@ FIGURE = 'figure_1'
 # column keys
 COLUMN_INPUT = 'input_column'
 COLUMN_OUTPUT = 'output_column'
+#button keys
 SAVE_BUTTON = 'Save Image'
 STEP_TEXT_KEY = 'step_text'
 STEP_TEXT_FORMAT = 'Step %d of %d'
+RUN_BUTTON = 'Run'
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -120,7 +122,7 @@ def simple_gui(debug=False):
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
-                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR))]
+                        'Run', button_color=(TEXT_COLOR, BACKGROUND_COLOR), key = RUN_BUTTON)]
                     ]
     output_column = [[sg.pin(sg.Canvas(key=FIGURE))],
                      [sg.Text('', key=STEP_TEXT_KEY)],
@@ -194,13 +196,11 @@ def simple_gui(debug=False):
     process = 0
     #forever loop
     while True:
-        event, values = window.read()
-        print(event)
-        print(values)
         #check if it's time to graph
         if graph_time:
-            #check if files with sm or if names exist
-            if os.path.isfile(sim_sm_name) and os.path.isfile(sim_if_name):
+            #check if the process is done
+            if process.poll() is not None:
+                print("Simulation Completed")
                 #initially plot the graph
                 graph_data, fig = initially_plot_network(simulation_name, fig)
                 #get the data required from the graph data and draw the figure
@@ -215,7 +215,12 @@ def simple_gui(debug=False):
                 simulation_running = False
                 #set the graph time to false
                 graph_time = False
-                print("Simulation Completed")
+                #update the run button to say Run
+                window[RUN_BUTTON].update("Run")
+        else:
+            event, values = window.read()
+            print(event)
+            print(values)
                 
             
         
@@ -248,8 +253,10 @@ def simple_gui(debug=False):
             #set the sm and if names
             sim_sm_name = simulation_name + "_sm.mat"
             sim_if_name = simulation_name + "_if.mat"
+            print(sim_sm_name)
+            print(sim_if_name)
             #check that there's no process
-            if process == 0:
+            if process is None:
                 numIterations = graph_data.get_num_steps(
                 graph_data.get_iteration_index_with_most_failures())
                 update_step_text(window, simStep, numIterations)
@@ -262,6 +269,10 @@ def simple_gui(debug=False):
                 print('simulation is running')
                 simulation_running = True
                 graph_time = True
+                #update the run button on the window to say loading
+                window[RUN_BUTTON].Update('Loading...')
+                #refresh the window
+                window.refresh()
             
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
@@ -362,6 +373,8 @@ def simple_gui(debug=False):
             redrawFigure = False
         # disable first and last buttons if at the beginning or end of the simulation
         disable_forward_back_buttons(window, simStep, numIterations)
+        
+        event = ''
 
     window.close()
     # quit application
