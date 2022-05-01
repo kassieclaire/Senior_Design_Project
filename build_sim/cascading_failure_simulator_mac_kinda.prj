@@ -3,7 +3,7 @@
     <param.appname>cascading_failure_simulator</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>1.5</param.version>
+    <param.version>1.6</param.version>
     <param.authnamewatermark>Kassie Povinelli, SACE Lab</param.authnamewatermark>
     <param.email>kassie.povinelli@gmail.com</param.email>
     <param.company>SACE Lab, Marquette University</param.company>
@@ -19,7 +19,10 @@ initial failures: The number of initial failures to start with -- these are like
 load-generation ratio: In the range of 0 to 1, where when 1, load is equivalent to the entire generation capacity. Generally a good indicator of how much the grid is strained at the start
 load-shed constant: In the range of 0 to 1, where when it is 0, operators have full control of when to shed loads (not meet the load requirements), and when it is 1, operators have no control over what loads to meet.
 Estimation error: The maximum capacities for power lines are estimates of what they can handle without tripping. If the error for these estimates is sufficiently high, they can fail sooner than expected
-output name: the names of the output files, including the states matrix (output_name + "_sm.mat") and the initial failures table (output_name + "_if.mat")</param.description>
+output name: the names of the output files, including the states matrix (output_name + "_sm.mat") and the initial failures table (output_name + "_if.mat")
+
+Version 1.6:
+Updated tracking of accumulated capacities so that initial failures are tracked and so that the accumulated capacities aren't overwrittten with load-shedding information</param.description>
     <param.screenshot />
     <param.guid />
     <param.installpath.string>/SACE_Lab,_Marquette_University/cascading_failure_simulator/</param.installpath.string>
@@ -73,7 +76,10 @@ initial failures: The number of initial failures to start with -- these are like
 load-generation ratio: In the range of 0 to 1, where when 1, load is equivalent to the entire generation capacity. Generally a good indicator of how much the grid is strained at the start
 load-shed constant: In the range of 0 to 1, where when it is 0, operators have full control of when to shed loads (not meet the load requirements), and when it is 1, operators have no control over what loads to meet.
 Estimation error: The maximum capacities for power lines are estimates of what they can handle without tripping. If the error for these estimates is sufficiently high, they can fail sooner than expected
-output name: the names of the output files, including the states matrix (output_name + "_sm.mat") and the initial failures table (output_name + "_if.mat")</param.help.text>
+output name: the names of the output files, including the states matrix (output_name + "_sm.mat") and the initial failures table (output_name + "_if.mat")
+
+Version 1.6:
+Updated tracking of accumulated capacities so that initial failures are tracked and so that the accumulated capacities aren't overwrittten with load-shedding information</param.help.text>
     <unset>
       <param.icon />
       <param.icons />
