@@ -274,13 +274,23 @@ def simple_gui(debug=False):
             simulation_obj = sim_connect.Simulation(
                 case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size)
 
-            print("Running simulation...")
-            gui_utilities.update_text(
-                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
-            window.perform_long_operation(
-                simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
-            window.perform_long_operation(
-                lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+            window[KEY_PROGRESS_BAR].UpdateBar(0)
+            # if the simulation has not been run yet, run it
+            if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.NOT_RUN:
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
+                print("Running simulation...")
+                window.perform_long_operation(
+                    simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
+                window.perform_long_operation(
+                    lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+            # otherwise, load the simulation data
+            else:
+                print('Simulation already performed, loading simulation data...')
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
+                window.perform_long_operation(
+                    simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
 
             # TODO run the simulation in a separate thread
 
