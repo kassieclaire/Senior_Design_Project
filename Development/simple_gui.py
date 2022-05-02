@@ -38,10 +38,15 @@ SIZE_INPUT_FRAME = (300, 60)
 
 # slider keys
 KEY_INPUT_BOX_ITERATIONS = 'text_box_iterations'
+DEFAULT_INPUT_BOX_ITERATIONS = 100000
 KEY_SLIDER_LOAD = 'slider_load'
+DEFAULT_SLIDER_LOAD = 0.7
 KEY_SLIDER_INITIAL_FAILURES = 'slider_init_failures'
+DEFAULT_SLIDER_INITIAL_FAILURES = 2
 KEY_SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
+DEFAULT_SLIDER_LOAD_SHED_CONST = 0.1
 KEY_SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
+DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR = 0.1
 MPC_PATH = 'case118_mpc_presim.mat'
 PATH_SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
 PATH_SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
@@ -135,20 +140,20 @@ def simple_gui(debug=False):
 
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                    [sg.Frame('Iterations', [[sg.InputText(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
-                                                           size=SIZE_INPUT_BOX)]], border_width=10, relief='flat')],
+                    [sg.Frame('Iterations', [[sg.Input(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+                                                       size=SIZE_INPUT_BOX, default_text=str(DEFAULT_INPUT_BOX_ITERATIONS))]], border_width=10, relief='flat')],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER)],
+                        label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_INITIAL_FAILURES)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD_SHED_CONST)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
                         sg.Button('Run', key=KEY_BUTTON_SIM_RUN, button_color=(
                             TEXT_COLOR, BACKGROUND_COLOR)),
