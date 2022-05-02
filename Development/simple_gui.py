@@ -1,7 +1,9 @@
 # function imports
 import sim_connect
 from p_stop_curve import cascading_failure_function
-from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action
+import draw_plot
+from draw_plot import draw_figure
+# from draw_plot import draw_plot, run_button_action, draw_figure, simple_run_button_action
 # from plot_topology import plot_topology
 import generate_mpc_plot_networkx
 import load_sim_data
@@ -28,6 +30,8 @@ from sim_connect import SimulationStatus
 import user_facing_text
 #import simulation organization
 from organize_simulation import organize_simulation
+import enum
+
 # color and size specifications
 
 SIZE_INPUT_BOX = (24, 1)
@@ -36,10 +40,15 @@ SIZE_INPUT_FRAME = (300, 60)
 
 # slider keys
 KEY_INPUT_BOX_ITERATIONS = 'text_box_iterations'
+DEFAULT_INPUT_BOX_ITERATIONS = 100000
 KEY_SLIDER_LOAD = 'slider_load'
+DEFAULT_SLIDER_LOAD = 0.7
 KEY_SLIDER_INITIAL_FAILURES = 'slider_init_failures'
+DEFAULT_SLIDER_INITIAL_FAILURES = 2
 KEY_SLIDER_LOAD_SHED_CONST = 'slider_load_shed_const'
+DEFAULT_SLIDER_LOAD_SHED_CONST = 0.1
 KEY_SLIDER_CAPACITY_ESTIMATION_ERROR = 'slider_line_cap_uncertainty'
+DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR = 0.1
 MPC_PATH = 'case118_mpc_presim.mat'
 PATH_SIM_STATE_MATRIX = 'case118_f2_r7_t1_e1_i100000_sm.mat'
 PATH_SIM_INITIAL_FAILURES = 'case118_f2_r7_t1_e1_i100000_if.mat'
@@ -57,6 +66,11 @@ KEY_BUTTON_SIM_CANCEL = 'Cancel'
 ANIMATE_TOPOLOGY_DELAY = 0.5
 KEY_PROGRESS_BAR = 'progress_bar'
 KEY_TIMER_PROGRESS_BAR = 'progress_bar_timer'
+GROUP_ID_RADIO_PLOT_TYPE = 'radio_plot_type'
+KEY_RADIO_PSTOP = 'radio_pstop'
+TEXT_RADIO_PSTOP = 'PStop Graph'
+KEY_RAIDO_TOPOLOGY_PLAYTHROUGH = 'radio_topology'
+TEXT_RADIO_TOPOLOGY_PLAYTHROUGH = 'Simulation Playthrough'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
@@ -88,6 +102,11 @@ cap_loss = 1500
 delivery_loss_percent = 8
 worst_cluster = 4
 num_lines = 186
+
+
+class FigureState(enum.Enum):
+    PSTOP = 1
+    TOPOLOGY = 2
 
 
 def disable_forward_back_buttons(window, simStep, numIterations):
@@ -123,20 +142,20 @@ def simple_gui(debug=False):
 
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
-                    [sg.Frame('Iterations', [[sg.InputText(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
-                                                           size=SIZE_INPUT_BOX)]], border_width=10, relief='flat')],
+                    [sg.Frame('Iterations', [[sg.Input(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+                                                       size=SIZE_INPUT_BOX, default_text=str(DEFAULT_INPUT_BOX_ITERATIONS))]], border_width=10, relief='flat')],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER)],
+                        label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_INITIAL_FAILURES)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD_SHED_CONST)],
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
-                        label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER)],
+                        label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
                         sg.Button('Run', key=KEY_BUTTON_SIM_RUN, button_color=(
                             TEXT_COLOR, BACKGROUND_COLOR)),
@@ -155,6 +174,8 @@ def simple_gui(debug=False):
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Button(LABEL_BUTTON_SAVE, key=KEY_BUTTON_SAVE, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
+                     [sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
+                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RAIDO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
                          str(delivery_loss_percent) + "%")],
                      [sg.Text('Max Line Capacity: '),
@@ -199,8 +220,10 @@ def simple_gui(debug=False):
 
     simStep = 0
     animateTopology = False
-    fig = graph_data.plot_topology(
-        iteration_index, simStep)
+    figure_display_state = FigureState.PSTOP
+    # fig = graph_data.plot_topology(
+    #     iteration_index, simStep)
+    fig = plt.figure()
     # fig = generate_mpc_plot_networkx.plot_network(branch_data, initial_failures, state_matrix,
     #                                               negativeOneIndices, mostFailureSimIndex, simStep, True, False, fig=None)
     # fig = plot_topology()
@@ -223,8 +246,8 @@ def simple_gui(debug=False):
 
     while True:
         event, values = window.read()
-        # print(event)
-        # print(values)
+        print(event)
+        print(values)
         if event == KEY_BUTTON_SIM_RUN:
             print('the "run" button has been pressed!')
             case_name = 'case118'
@@ -253,13 +276,23 @@ def simple_gui(debug=False):
             simulation_obj = sim_connect.Simulation(
                 case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size)
 
-            print("Running simulation...")
-            gui_utilities.update_text(
-                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
-            window.perform_long_operation(
-                simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
-            window.perform_long_operation(
-                lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+            window[KEY_PROGRESS_BAR].UpdateBar(0)
+            # if the simulation has not been run yet, run it
+            if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.NOT_RUN:
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
+                print("Running simulation...")
+                window.perform_long_operation(
+                    simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
+                window.perform_long_operation(
+                    lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+            # otherwise, load the simulation data
+            else:
+                print('Simulation already performed, loading simulation data...')
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
+                window.perform_long_operation(
+                    simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
 
             # TODO run the simulation in a separate thread
 
@@ -318,6 +351,14 @@ def simple_gui(debug=False):
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+
+        # handle selection between the chart types
+        elif event == KEY_RADIO_PSTOP:
+            figure_display_state = FigureState.PSTOP
+            redrawFigure = True
+        elif event == KEY_RAIDO_TOPOLOGY_PLAYTHROUGH:
+            figure_display_state = FigureState.TOPOLOGY
+            redrawFigure = True
 
         # TODO: update these so they do stuff with the topology -- update the topology plot
         elif event == 'First':
@@ -460,6 +501,7 @@ def simple_gui(debug=False):
             # will do nothing if not running
             if simulation_obj is not None:
                 simulation_obj.kill_simulation()
+            # break out of the loop so that the program will close
             break
 
         # check the bounds on the simulation iteration
@@ -467,6 +509,7 @@ def simple_gui(debug=False):
             simStep = 0
         elif simStep >= num_steps:
             simStep = num_steps - 1
+            # if the simulation is playing through failures, stop it, as it has reached the end
             animateTopology = False
             window[KEY_BUTTON_ANIMATE].update(text='Play')
         # redraw the figure if the iteration has changed
@@ -475,8 +518,12 @@ def simple_gui(debug=False):
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
                                       FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             fig.clear()
-            fig = graph_data.plot_topology(
-                iteration_index, simStep, fig=fig)
+            if figure_display_state == FigureState.TOPOLOGY:
+                fig = graph_data.plot_topology(
+                    iteration_index, simStep, fig=fig)
+            elif figure_display_state == FigureState.PSTOP:
+                fig = draw_plot.draw_pstop_curve(
+                    fig, simulation_obj.get_states_dataframe())
             fig.canvas.draw()
             redrawFigure = False
         # disable first and last buttons if at the beginning or end of the simulation
