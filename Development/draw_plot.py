@@ -48,7 +48,7 @@ def draw_pstop_curve(fig, state_matrix_dataframe):
     # fig = plt.figure()
     # ax = plt.axes()
     plt.plot('x_values', 'cascade_stop', data=p_stop_df,
-             color='skyblue', linewidth=5)
+             color='skyblue', linewidth=1)
     plt.xlabel('Number of Failed Lines')
     plt.ylabel('Cascade-Stop Probability')
     plt.title('Cascade-Stop Probability vs Number of Line Failures')
