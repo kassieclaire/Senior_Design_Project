@@ -79,11 +79,9 @@ SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
 
 KEY_TEXT_SELECTED_SIM = 'sim_text'
-FORMAT_TEXT_SELECTED_SIM = 'Simulation %d out of %d'
 KEY_TEXT_SIM_STEP = 'step_text'
-FORMAT_TEXT_SIM_STEP = 'Step %d of %d'
 KEY_TEXT_SIM_STATUS = 'sim_status'
-FORMAT_TEXT_SIM_STATUS = '%s'
+
 # descriptions and tooltips
 description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
 # Tooltips
@@ -238,13 +236,13 @@ def simple_gui(debug=False):
     disable_forward_back_buttons(window, simStep, num_steps)
     # update_step_text(window, simStep, num_steps)
     gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
-                              FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
+                              user_facing_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
 
     # TODO change this hardcoded value
     simulation_select.display_iterations(
         window, graph_data, 0, 3000)
     gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                              FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                              user_facing_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
 
     # run loop
     event = ''
@@ -287,7 +285,7 @@ def simple_gui(debug=False):
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.NOT_RUN:
                 print("Running simulation...")
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
+                    window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
                 window[KEY_BUTTON_SIM_CANCEL].update(disabled=False)
                 window[KEY_BUTTON_SIM_RUN].update(disabled=True)
                 window.perform_long_operation(
@@ -298,7 +296,7 @@ def simple_gui(debug=False):
             else:
                 print('Simulation already performed, loading simulation data...')
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
+                    window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('loading data...'))
                 window.perform_long_operation(
                     simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
 
@@ -322,13 +320,13 @@ def simple_gui(debug=False):
             # if it is not complete and has reached this point, this means the simulation was killed
             if simulation_obj.get_simulation_status() != sim_connect.SimulationStatus.COMPLETE:
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation cancelled'))
+                    window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('simulation cancelled'))
             # otherwise, the simulation has been completed, load it
             else:
                 print('Simulation complete!')
                 print('Loading simulation data...')
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
+                    window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('loading data...'))
                 window.perform_long_operation(
                     simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
             window[KEY_BUTTON_SIM_CANCEL].update(disabled=True)
@@ -338,7 +336,7 @@ def simple_gui(debug=False):
             print('Simulation loaded!')
             simStep = 0
             gui_utilities.update_text(
-                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, (
+                window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, (
                     'simulation loaded'))
             gui_utilities.update_text(
                 window, KEY_TEXT_TOP_LABEL, user_facing_text.FORMAT_TEXT_TOP_LABEL, (simulation_obj.iterations, simulation_obj.initial_failures, simulation_obj.load_generation_ratio, simulation_obj.load_shed_constant, simulation_obj.estimation_error))
@@ -349,10 +347,10 @@ def simple_gui(debug=False):
                 iteration_index)
             num_iterations = graph_data.get_num_iterations()
             gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                                      FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                                      user_facing_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
             # update_step_text(window, simStep, num_steps)
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
-                                      FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
+                                      user_facing_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             simulation_select.display_iterations(
                 window, graph_data, int(values[simulation_select.SLIDER_MIN_LINE_FAILURES]), int(values[simulation_select.SLIDER_MAX_LINE_FAILURES]))
             redrawFigure = True
@@ -366,7 +364,7 @@ def simple_gui(debug=False):
             if percent_complete > 0.0 and simulation_obj.get_simulation_status() == SimulationStatus.RUNNING:
                 print('updating percentage')
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('%d%% complete' % percent_complete))
+                    window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('%d%% complete' % percent_complete))
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
@@ -374,7 +372,7 @@ def simple_gui(debug=False):
         elif event == KEY_BUTTON_SIM_CANCEL:
             print('Simulation cancelled!')
             gui_utilities.update_text(
-                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('cancelling...'))
+                window, KEY_TEXT_SIM_STATUS, user_facing_text.FORMAT_TEXT_SIM_STATUS, ('cancelling...'))
             simulation_obj.kill_simulation()
 
         # handle selection between the chart types
@@ -443,7 +441,7 @@ def simple_gui(debug=False):
             num_steps = graph_data.get_num_steps(
                 iteration_index)
             gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                                      FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                                      user_facing_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
             simStep = 0
             redrawFigure = True
 
@@ -541,7 +539,7 @@ def simple_gui(debug=False):
         if redrawFigure:
             # update_step_text(window, simStep, num_steps)
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
-                                      FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
+                                      user_facing_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
             fig.clear()
             if figure_display_state == FigureState.TOPOLOGY:
                 fig = graph_data.plot_topology(

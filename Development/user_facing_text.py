@@ -23,3 +23,6 @@ TEXT_ABOUT_SIMULATOR_POPUP = (
 )
 
 FORMAT_TEXT_TOP_LABEL = 'Results for %d iterations, %d initial failures, %.2f load generation ratio, %.2f load shedding constant, and %.2f estimation error'
+FORMAT_TEXT_SELECTED_SIM = 'Simulation %d out of %d'
+FORMAT_TEXT_SIM_STEP = 'Step %d of %d'
+FORMAT_TEXT_SIM_STATUS = '%s'
