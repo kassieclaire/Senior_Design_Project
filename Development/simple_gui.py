@@ -160,9 +160,8 @@ def simple_gui(debug=False):
                     [sg.HorizontalSeparator()],
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
-                    [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
-                        sg.Button(TEXT_BUTTON_SIM_RUN, key=KEY_BUTTON_SIM_RUN, button_color=(
-                            TEXT_COLOR, BACKGROUND_COLOR)),
+                    [sg.Button(TEXT_BUTTON_SIM_RUN, key=KEY_BUTTON_SIM_RUN, button_color=(
+                        TEXT_COLOR, BACKGROUND_COLOR)),
                         sg.Button(TEXT_BUTTON_SIM_CANCEL, key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR), disabled=True)],
                     [sg.Text('Status:', size=(8, 1)), sg.Text('No simulation running.',
                                                               key=KEY_TEXT_SIM_STATUS, size=(20, 1))],
