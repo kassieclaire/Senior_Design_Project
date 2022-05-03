@@ -1,3 +1,23 @@
+
+inputs =
+
+  8x1 cell array
+
+    {'case118'    }
+    {'100'        }
+    {'3'          }
+    {'.9'         }
+    {'.9'         }
+    {'.02'        }
+    {'test_output'}
+    {'16'         }
+
+
+CaseName =
+
+    'case118'
+
 Number of iterations exceeds amount allowed for single group. Splitting into 7 simulations of max size 16
 Starting simulations from starting index 1 to ending index 16
-
+Starting parallel pool (parpool) using the 'local' profile ...
+Connected to the parallel pool (number of workers: 4).

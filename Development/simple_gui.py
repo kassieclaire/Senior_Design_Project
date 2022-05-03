@@ -170,11 +170,11 @@ def simple_gui(debug=False):
     output_column = [[sg.Text('Simulation Outputs', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
                      [sg.Text('No Simulation Loaded', key=KEY_TEXT_TOP_LABEL, size=(
                          90, 2), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
-                     [sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
-                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE,
-                               key=KEY_RADIO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
                      [sg.Column(
-                         [[sg.pin(sg.Canvas(key=KEY_FIGURE))],
+                         [[sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
+                           sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE,
+                                    key=KEY_RADIO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
+                          [sg.pin(sg.Canvas(key=KEY_FIGURE))],
                           [sg.Text('', key=KEY_TEXT_SELECTED_SIM)],
                              [sg.Text('', key=KEY_TEXT_SIM_STEP)],
                              [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
@@ -536,7 +536,8 @@ def simple_gui(debug=False):
             animateTopology = False
             window[KEY_BUTTON_ANIMATE].update(text='Play')
         # redraw the figure if the iteration has changed
-        if redrawFigure:
+        # only redraw if a simulation is loaded, avoids crashes
+        if redrawFigure and simulation_obj is not None:
             # update_step_text(window, simStep, num_steps)
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
                                       user_facing_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
