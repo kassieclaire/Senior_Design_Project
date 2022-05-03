@@ -165,7 +165,7 @@ class Simulation:
             #     output_name = get_output_name(
             #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
             # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
-            print(argString)
+            #print(argString)
             # create a simulator process and run it and get the log
             process = subprocess.Popen(
                 [mac_executable, mac_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
