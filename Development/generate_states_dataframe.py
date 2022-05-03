@@ -195,8 +195,9 @@ def generate_states_df(states_matrix_name='states',initial_failure_table_name='i
 
     #Save the dataframe
     if save_as_csv:
-        if output_df_name[-4:-1] != ['.','c','s','v']:
-            output_df_name += '.csv'
+        #if the output_df_name is shorter than 4 characters or does not end in .csv, add it
+        if len(output_df_name) < 4 or output_df_name[-4:] != '.csv':
+            output_df_name = output_df_name + '.csv'
         states_df.to_csv(output_df_name, index=False)
         #print("Iteration track = ", iteration_track) #check, should be the number of iterations run
         #print(cluster_failures)

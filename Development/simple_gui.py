@@ -28,6 +28,8 @@ import time
 import sim_connect
 from sim_connect import SimulationStatus
 import user_facing_text
+#import simulation organization
+from organize_simulation import organize_simulation
 import enum
 
 # color and size specifications

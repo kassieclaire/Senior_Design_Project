@@ -162,8 +162,7 @@ def get_failure_array_at_iteration(initial_failures, state_matrix, line_failed_n
     state_matrix = get_single_simulation_state_matrix(
         state_matrix, line_failed_negative_one_indices, simulation_index)
     # initial_failures = initial_failures[simulation_index]
-    failures = initial_failures[simulation_index] + \
-        state_matrix['Failed Line Index'][1:iteration_index + 1].tolist()
+    failures = initial_failures[simulation_index] + state_matrix['Failed Line Index'][1:iteration_index + 1].tolist()
     return failures
 
 
