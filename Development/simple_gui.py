@@ -61,15 +61,17 @@ LABEL_BUTTON_SAVE = 'Save Image'
 KEY_BUTTON_SAVE = 'save_button'
 KEY_BUTTON_ANIMATE = 'animate_button'
 KEY_TIMER_ANIMATE = 'animate_action_timer'
-KEY_BUTTON_SIM_RUN = 'Run'
-KEY_BUTTON_SIM_CANCEL = 'Cancel'
+KEY_BUTTON_SIM_RUN = 'run_button'
+TEXT_BUTTON_SIM_RUN = 'Run'
+KEY_BUTTON_SIM_CANCEL = 'cancel_button'
+TEXT_BUTTON_SIM_CANCEL = 'Cancel'
 ANIMATE_TOPOLOGY_DELAY = 0.5
 KEY_PROGRESS_BAR = 'progress_bar'
 KEY_TIMER_PROGRESS_BAR = 'progress_bar_timer'
 GROUP_ID_RADIO_PLOT_TYPE = 'radio_plot_type'
 KEY_RADIO_PSTOP = 'radio_pstop'
 TEXT_RADIO_PSTOP = 'PStop Graph'
-KEY_RAIDO_TOPOLOGY_PLAYTHROUGH = 'radio_topology'
+KEY_RADIO_TOPOLOGY_PLAYTHROUGH = 'radio_topology'
 TEXT_RADIO_TOPOLOGY_PLAYTHROUGH = 'Simulation Playthrough'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
@@ -157,9 +159,9 @@ def simple_gui(debug=False):
                     [gui_utilities.make_slider_with_frame(
                         label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
                     [sg.Button('More Options', button_color=(TEXT_COLOR, BACKGROUND_COLOR)),
-                        sg.Button('Run', key=KEY_BUTTON_SIM_RUN, button_color=(
+                        sg.Button(TEXT_BUTTON_SIM_RUN, key=KEY_BUTTON_SIM_RUN, button_color=(
                             TEXT_COLOR, BACKGROUND_COLOR)),
-                        sg.Button('Cancel', key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                        sg.Button(TEXT_BUTTON_SIM_CANCEL, key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR), disabled=True)],
                     [sg.Text('Status:', size=(8, 1)), sg.Text('No simulation running.',
                                                               key=KEY_TEXT_SIM_STATUS, size=(20, 1))],
                     [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=KEY_PROGRESS_BAR,
@@ -175,7 +177,7 @@ def simple_gui(debug=False):
                      [sg.Button(LABEL_BUTTON_SAVE, key=KEY_BUTTON_SAVE, button_color=(
                          TEXT_COLOR, BACKGROUND_COLOR))],
                      [sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
-                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RAIDO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
+                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
                      [sg.Text('Loss of Delivery Capacity: '), sg.Text(
                          str(delivery_loss_percent) + "%")],
                      [sg.Text('Max Line Capacity: '),
@@ -275,13 +277,14 @@ def simple_gui(debug=False):
             #                                            load_generation_ratio, load_shed_constant, estimation_error, batch_size)
             simulation_obj = sim_connect.Simulation(
                 case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size)
-
             window[KEY_PROGRESS_BAR].UpdateBar(0)
             # if the simulation has not been run yet, run it
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.NOT_RUN:
+                print("Running simulation...")
                 gui_utilities.update_text(
                     window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation starting...'))
-                print("Running simulation...")
+                window[KEY_BUTTON_SIM_CANCEL].update(disabled=False)
+                window[KEY_BUTTON_SIM_RUN].update(disabled=True)
                 window.perform_long_operation(
                     simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
                 window.perform_long_operation(
@@ -310,12 +313,21 @@ def simple_gui(debug=False):
             # redrawFigure = True
 
         elif event == SIMULATION_COMPLETE_ACTION:
-            print('Simulation complete!')
-            print('Loading simulation data...')
-            gui_utilities.update_text(
-                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
-            window.perform_long_operation(
-                simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
+            # check if the simulation has been fully run
+            # if it is not complete and has reached this point, this means the simulation was killed
+            if simulation_obj.get_simulation_status() != sim_connect.SimulationStatus.COMPLETE:
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('simulation cancelled'))
+            # otherwise, the simulation has been completed, load it
+            else:
+                print('Simulation complete!')
+                print('Loading simulation data...')
+                gui_utilities.update_text(
+                    window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('loading data...'))
+                window.perform_long_operation(
+                    simulation_obj.load_simulation, SIMULATION_LOADED_ACTION)
+            window[KEY_BUTTON_SIM_CANCEL].update(disabled=True)
+            window[KEY_BUTTON_SIM_RUN].update(disabled=False)
 
         elif event == SIMULATION_LOADED_ACTION:
             print('Simulation loaded!')
@@ -352,11 +364,17 @@ def simple_gui(debug=False):
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
 
+        elif event == KEY_BUTTON_SIM_CANCEL:
+            print('Simulation cancelled!')
+            gui_utilities.update_text(
+                window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, ('cancelling...'))
+            simulation_obj.kill_simulation()
+
         # handle selection between the chart types
         elif event == KEY_RADIO_PSTOP:
             figure_display_state = FigureState.PSTOP
             redrawFigure = True
-        elif event == KEY_RAIDO_TOPOLOGY_PLAYTHROUGH:
+        elif event == KEY_RADIO_TOPOLOGY_PLAYTHROUGH:
             figure_display_state = FigureState.TOPOLOGY
             redrawFigure = True
 
