@@ -11,7 +11,7 @@ import re
 from threading import Timer
 from subprocess import TimeoutExpired
 import pandas as pd
-#import all functions from organize_simulation.py
+# import all functions from organize_simulation.py
 from organize_simulation import *
 # defines for executables -- make sure to include path, etc.
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
@@ -65,7 +65,7 @@ class Simulation:
         self.state_matrix = None
         self.initial_failure_array = None
         self.pstop = None
-        #if the simulation folder exists, mark the simulation as complete (but not loaded), otherwise mark it as not run
+        # if the simulation folder exists, mark the simulation as complete (but not loaded), otherwise mark it as not run
         if simulation_folder_exists(self.output_name):
             self.status = SimulationStatus.RUN_BEFORE
             self.fraction_complete = 1.0
@@ -111,7 +111,8 @@ class Simulation:
             return self.initial_failure_array
         else:
             return None
-    #get pstop df function
+    # get pstop df function
+
     def get_pstop_df(self):
         """
         Returns the pstop arrays for the simulation if the simulation is loaded, otherwise returns None.
@@ -120,6 +121,7 @@ class Simulation:
             return self.pstop
         else:
             return None
+
     def kill_simulation(self):
         self.__kill_simulation = True
 
@@ -165,7 +167,7 @@ class Simulation:
             #     output_name = get_output_name(
             #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
             # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
-            #print(argString)
+            # print(argString)
             # create a simulator process and run it and get the log
             process = subprocess.Popen(
                 [mac_executable, mac_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
@@ -176,6 +178,7 @@ class Simulation:
             return
 
         # wait for the simulation to finish
+        log_file = open(self.output_name + "_log.txt", "w")
         while process.poll() is None:
             # print('Process is running...')
             timer = Timer(interval=1, function=lambda: None)
@@ -191,6 +194,7 @@ class Simulation:
                 # print('Output: ', process_output)
                 # if the output indicates a new batch is started, update the fraction complete
                 # for line in process_output:
+                log_file.write(process_output + '\n')
                 if process_output.startswith('Starting simulations from starting index'):
                     startIndex, endIndex = [
                         int(x) for x in re.findall(r'\d+', process_output)]
@@ -206,8 +210,10 @@ class Simulation:
                 self.fraction_complete = 0.0
                 self.__kill_simulation = False
                 self.status = SimulationStatus.NOT_RUN
+                log_file.close()
                 return
             time.sleep(1)
+        log_file.close()
         self.status = SimulationStatus.COMPLETE
         self.fraction_complete = 1.0
 
@@ -215,29 +221,31 @@ class Simulation:
         if self.status != SimulationStatus.COMPLETE and self.status != SimulationStatus.RUN_BEFORE:
             print("Simulation has not been run or has already been loaded.")
             return
-        #if the simulation has been completed, load the data
+        # if the simulation has been completed, load the data
         if self.status == SimulationStatus.COMPLETE:
             self.status = SimulationStatus.LOADING
-            
+
             # generate the states dataframe
             self.state_matrix = generate_states_df(
                 states_matrix_name=self.output_name + "_sm.mat", initial_failure_table_name=self.output_name + "_if.mat", output_df_name=self.output_name + "_df", save_as_csv=True)
-            #generate the pstop dataframe using the states dataframe and save as csv
+            # generate the pstop dataframe using the states dataframe and save as csv
             self.pstop = generate_generic_pStop(self.state_matrix)
-            #save the pstop dataframe as a csv
+            # save the pstop dataframe as a csv
             self.pstop.to_csv(self.output_name + "_pstop.csv")
             self.initial_failure_array = load_initial_failures(
                 self.output_name + "_if.mat")
-            #TODO: save the log of the simulation
-            
-            #organize the files into the appropriate folders
+            # TODO: save the log of the simulation
+
+            # organize the files into the appropriate folders
             organize_simulation(self.output_name)
-        #else if the simulation has been run before, load the data from the folder
+        # else if the simulation has been run before, load the data from the folder
         elif self.status == SimulationStatus.RUN_BEFORE:
             self.status = SimulationStatus.LOADING
-            self.state_matrix = pd.read_csv(get_dataframe_file_name(self.output_name))
+            self.state_matrix = pd.read_csv(
+                get_dataframe_file_name(self.output_name))
             self.pstop = pd.read_csv(get_pstop_file_name(self.output_name))
-            self.initial_failure_array = load_initial_failures(get_initial_failures_matrix_file_name(simulation_name=self.output_name))
+            self.initial_failure_array = load_initial_failures(
+                get_initial_failures_matrix_file_name(simulation_name=self.output_name))
         self.status = SimulationStatus.LOADED
 
     def simulate_and_load(self):
