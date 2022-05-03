@@ -21,3 +21,5 @@ TITLE_ABOUT_SIMULATOR_POPUP = 'About The Simulator'
 TEXT_ABOUT_SIMULATOR_POPUP = (
 
 )
+
+FORMAT_TEXT_TOP_LABEL = 'Results for %d iterations, %d initial failures, %.2f load generation ratio, %.2f load shedding constant, and %.2f estimation error'

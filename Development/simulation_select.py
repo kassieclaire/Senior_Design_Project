@@ -30,12 +30,14 @@ class SimulationListing():
 
 
 def getGUIElement():
-    layout = sg.Column([[gui_utilities.make_slider_with_frame('Minimum Line Failures', SLIDER_MIN_LINE_FAILURES, range=(0, 100), resolution=1)],
+    layout = sg.Column([[sg.Text('Simulation Selection')],
+                        [gui_utilities.make_slider_with_frame(
+                            'Minimum Line Failures', SLIDER_MIN_LINE_FAILURES, range=(0, 100), resolution=1)],
                         [gui_utilities.make_slider_with_frame(
                             'Maximum Line Failures', SLIDER_MAX_LINE_FAILURES, range=(0, 100), resolution=1, default_value=100)],
                         [sg.Button('Update Filters',
                                    key=UPDATE_FILTERS_BUTTON, enable_events=True, button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                        [sg.Listbox(values=[], key=ITERATION_SELECTION_LIST, enable_events=True, size=(24, 10))]])
+                        [sg.Listbox(values=[], key=ITERATION_SELECTION_LIST, enable_events=True, size=(24, 10))]], element_justification='c')
     return layout
 
 

@@ -73,6 +73,7 @@ KEY_RADIO_PSTOP = 'radio_pstop'
 TEXT_RADIO_PSTOP = 'PStop Graph'
 KEY_RADIO_TOPOLOGY_PLAYTHROUGH = 'radio_topology'
 TEXT_RADIO_TOPOLOGY_PLAYTHROUGH = 'Simulation Playthrough'
+KEY_TEXT_TOP_LABEL = 'text_top_label'
 
 SIMULATION_COMPLETE_ACTION = 'simulation_complete'
 SIMULATION_LOADED_ACTION = 'simulation_loaded'
@@ -144,6 +145,7 @@ def simple_gui(debug=False):
 
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
+                    [sg.Text('Simulation Inputs')],
                     [sg.Frame('Iterations', [[sg.Input(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
                                                        size=SIZE_INPUT_BOX, default_text=str(DEFAULT_INPUT_BOX_ITERATIONS))]], border_width=10, relief='flat')],
                     [sg.HorizontalSeparator()],
@@ -167,33 +169,38 @@ def simple_gui(debug=False):
                     [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=KEY_PROGRESS_BAR,
                                                                        orientation='horizontal', max_value=100, size=(20, 20))]
                     ]
-    output_column = [[sg.pin(sg.Canvas(key=KEY_FIGURE))],
-                     [sg.Text('', key=KEY_TEXT_SELECTED_SIM)],
-                     [sg.Text('', key=KEY_TEXT_SIM_STEP)],
-                     [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
-                         'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Button('Play', key=KEY_BUTTON_ANIMATE, button_color=(
-                         TEXT_COLOR, BACKGROUND_COLOR))],
-                     [sg.Button(LABEL_BUTTON_SAVE, key=KEY_BUTTON_SAVE, button_color=(
-                         TEXT_COLOR, BACKGROUND_COLOR))],
+
+    output_column = [[sg.Text('Simulation Outputs', background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
+                     [sg.Text('No Simulation Loaded', key=KEY_TEXT_TOP_LABEL, size=(
+                         90, 2), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
                      [sg.Radio(TEXT_RADIO_PSTOP, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_PSTOP, default=True, enable_events=True),
-                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE, key=KEY_RADIO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
-                     [sg.Text('Loss of Delivery Capacity: '), sg.Text(
-                         str(delivery_loss_percent) + "%")],
-                     [sg.Text('Max Line Capacity: '),
-                     sg.Text(str(cap_loss) + " MW")],
-                     [sg.Text('Worst-off Cluster: '),
-                      sg.Text(str(worst_cluster))],
-                     [sg.Text('Probability of failure: '),
-                     sg.Text('Click on Line')]
+                      sg.Radio(TEXT_RADIO_TOPOLOGY_PLAYTHROUGH, GROUP_ID_RADIO_PLOT_TYPE,
+                               key=KEY_RADIO_TOPOLOGY_PLAYTHROUGH, enable_events=True)],
+                     [sg.Column(
+                         [[sg.pin(sg.Canvas(key=KEY_FIGURE))],
+                          [sg.Text('', key=KEY_TEXT_SELECTED_SIM)],
+                             [sg.Text('', key=KEY_TEXT_SIM_STEP)],
+                             [sg.Button('First', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Back', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button(
+                                 'Forward', button_color=(TEXT_COLOR, BACKGROUND_COLOR)), sg.Button('Last', button_color=(TEXT_COLOR, BACKGROUND_COLOR))],
+                             [sg.Button('Play', key=KEY_BUTTON_ANIMATE, button_color=(
+                                 TEXT_COLOR, BACKGROUND_COLOR))],
+                             [sg.Text('Loss of Delivery Capacity: '),
+                              sg.Text(str(delivery_loss_percent) + "%")],
+                             [sg.Text('Max Line Capacity: '),
+                              sg.Text(str(cap_loss) + " MW")],
+                             [sg.Text('Worst-off Cluster: '),
+                              sg.Text(str(worst_cluster))],
+                             [sg.Text('Probability of failure: '),
+                              sg.Text('Click on Line')]], element_justification='c'),
+                      simulation_select.getGUIElement()]
                      ]
+
     # full layout
     layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
                sg.VerticalSeparator(),
-               sg.Column(output_column, key=COLUMN_OUTPUT,
-                         element_justification='c', background_color=BACKGROUND_COLOR),
-               simulation_select.getGUIElement()]]
+               sg.Column(output_column)]]
+    #    simulation_select.getGUIElement()]]
 
     # create the window with the layout
     window = sg.Window('Cascading Failure Simulator',
@@ -334,6 +341,8 @@ def simple_gui(debug=False):
             gui_utilities.update_text(
                 window, KEY_TEXT_SIM_STATUS, FORMAT_TEXT_SIM_STATUS, (
                     'simulation loaded'))
+            gui_utilities.update_text(
+                window, KEY_TEXT_TOP_LABEL, user_facing_text.FORMAT_TEXT_TOP_LABEL, (simulation_obj.iterations, simulation_obj.initial_failures, simulation_obj.load_generation_ratio, simulation_obj.load_shed_constant, simulation_obj.estimation_error))
             graph_data = generate_mpc_plot_networkx.TopologyIterationData(
                 simulation_obj.get_states_dataframe(), simulation_obj.get_initial_failure_array(), case_name=case_name)
             iteration_index = graph_data.get_iteration_index_with_most_failures()
