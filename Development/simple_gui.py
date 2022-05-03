@@ -28,7 +28,7 @@ import time
 import sim_connect
 from sim_connect import SimulationStatus
 import user_facing_text
-#import simulation organization
+# import simulation organization
 from organize_simulation import organize_simulation
 import enum
 
@@ -189,9 +189,8 @@ def simple_gui(debug=False):
                      ]
     # full layout
     layout = [[sg.pin(sg.Menu(menu_def, pad=(0, 0), background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR))],
-              [sg.Text('Cascading failure Simulator',
-                       background_color=BACKGROUND_COLOR, text_color=TEXT_COLOR)],
               [sg.Column(input_column, key=COLUMN_INPUT, element_justification='c', background_color=BACKGROUND_COLOR),
+               sg.VerticalSeparator(),
                sg.Column(output_column, key=COLUMN_OUTPUT,
                          element_justification='c', background_color=BACKGROUND_COLOR),
                simulation_select.getGUIElement()]]
