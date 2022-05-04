@@ -161,7 +161,7 @@ def simple_gui(debug=False):
         [sg.Button(TEXT_BUTTON_SIM_RUN, key=KEY_BUTTON_SIM_RUN, button_color=(
             TEXT_COLOR, BACKGROUND_COLOR)),
          sg.Button(TEXT_BUTTON_SIM_CANCEL, key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR), disabled=True)],
-        [sg.Text('Status:', size=(8, 1)), sg.Text('No simulation running.',
+        [sg.Text('Status:', size=(8, 1)), sg.Text('no simulation running',
                                                   key=KEY_TEXT_SIM_STATUS, size=(20, 1))],
         [sg.Text('Progress:', size=(8, 1)), sg.ProgressBar(key=KEY_PROGRESS_BAR,
                                                            orientation='horizontal', max_value=100, size=(20, 20))]
@@ -242,7 +242,7 @@ def simple_gui(debug=False):
     simulation_select.display_iterations(
         window, graph_data, 0, 3000)
     gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                              ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                              ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations, graph_data.get_total_failures_at_iteration(iteration_index)))
 
     # run loop
     event = ''
@@ -292,6 +292,7 @@ def simple_gui(debug=False):
                     simulation_obj.run_simulation, SIMULATION_COMPLETE_ACTION)
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
+
             # otherwise, load the simulation data
             else:
                 print('Simulation already performed, loading simulation data...')
@@ -347,7 +348,7 @@ def simple_gui(debug=False):
                 iteration_index)
             num_iterations = graph_data.get_num_iterations()
             gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                                      ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                                      ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations, graph_data.get_total_failures_at_iteration(iteration_index)))
             # update_step_text(window, simStep, num_steps)
             gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
                                       ui_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
@@ -371,14 +372,13 @@ def simple_gui(debug=False):
 
         elif event == KEY_TIMER_PROGRESS_BAR:
             # print('Progress bar timer fired!')
-            percent_complete = int(
-                simulation_obj.get_fraction_complete() * 100)
-            window[KEY_PROGRESS_BAR].UpdateBar(percent_complete)
+            window[KEY_PROGRESS_BAR].UpdateBar(
+                int(simulation_obj.get_fraction_complete() * 100))
             # only change the status to reflect completeness once the first batch starts, and if other completeness items are not present
-            if percent_complete > 0.0 and simulation_obj.get_simulation_status() == SimulationStatus.RUNNING:
+            if simulation_obj.get_fraction_complete() > 0.0 and simulation_obj.get_simulation_status() == SimulationStatus.RUNNING:
                 print('updating percentage')
                 gui_utilities.update_text(
-                    window, KEY_TEXT_SIM_STATUS, ui_text.FORMAT_TEXT_SIM_STATUS, ('%d%% complete' % percent_complete))
+                    window, KEY_TEXT_SIM_STATUS, ui_text.FORMAT_TEXT_SIM_STATUS_PERCENT_COMPLETE, simulation_obj.get_fraction_complete())
             if simulation_obj.get_simulation_status() == sim_connect.SimulationStatus.RUNNING:
                 window.perform_long_operation(
                     lambda: time.sleep(1), KEY_TIMER_PROGRESS_BAR)
@@ -455,7 +455,7 @@ def simple_gui(debug=False):
             num_steps = graph_data.get_num_steps(
                 iteration_index)
             gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                                      ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations))
+                                      ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations, graph_data.get_total_failures_at_iteration(iteration_index)))
             simStep = 0
             redrawFigure = True
 

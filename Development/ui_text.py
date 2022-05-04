@@ -23,18 +23,20 @@ TEXT_ABOUT_SIMULATOR_POPUP = (
 
 )
 
-FORMAT_TEXT_TOP_LABEL = 'Results for %d iterations, %d initial failures, %.2f load generation ratio, %.2f load shedding constant, and %.2f estimation error'
-FORMAT_TEXT_SELECTED_SIM = 'Simulation %d out of %d'
-FORMAT_TEXT_SIM_STEP = 'Step %d of %d'
-FORMAT_TEXT_SIM_STATUS = '%s'
+FORMAT_TEXT_TOP_LABEL = 'Results for {:d} iterations, {:d} initial failures, {:.0%} load generation ratio, {:.0%} load shedding constant, and {:.0%} estimation error'
+FORMAT_TEXT_SELECTED_SIM = 'Simulation {:d} out of {:d}, {:d} failures'
+FORMAT_TEXT_SIM_STEP = 'Step {:d} of {:d}'
 
 KEY_TEXT_OUTPUT_AVG_FAILED_LINES = 'avg_failed_lines'
-FORMAT_TEXT_OUTPUT_AVG_FAILED_LINES = '%.2f'
+FORMAT_TEXT_OUTPUT_AVG_FAILED_LINES = '{:.2f}'
 KEY_TEXT_OUTPUT_MAX_FAILED_LINES = 'max_failed_lines'
-FORMAT_TEXT_OUTPUT_MAX_FAILED_LINES = '%.2f'
+FORMAT_TEXT_OUTPUT_MAX_FAILED_LINES = '{:.2f}'
 KEY_TEXT_OUTPUT_AVG_ACC_FAILED_CAPACITY = 'avg_acc_failed_capacity'
-FORMAT_TEXT_OUTPUT_AVG_ACC_FAILED_CAPACITY = '%.2f'
+FORMAT_TEXT_OUTPUT_AVG_ACC_FAILED_CAPACITY = '{:.2f}'
 KEY_TEXT_OUTPUT_MAX_ACC_FAILED_CAPACITY = 'max_acc_failed_capacity'
-FORMAT_TEXT_OUTPUT_MAX_ACC_FAILED_CAPACITY = '%.2f'
+FORMAT_TEXT_OUTPUT_MAX_ACC_FAILED_CAPACITY = '{:.2f}'
 
 # Simulation status messages
+# format string for percent complete while simulator is running
+FORMAT_TEXT_SIM_STATUS_PERCENT_COMPLETE = '{:.0%} complete'
+FORMAT_TEXT_SIM_STATUS = '{:s}'

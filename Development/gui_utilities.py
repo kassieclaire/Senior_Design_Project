@@ -18,5 +18,6 @@ def update_text(window, key, text_format, format_values):
     :param text_format: The format string to use.
     :param format_values: Tuple of the values to use in the format string.
     """
-    window[key].update(text_format %
-                       format_values)
+    if type(format_values) is not tuple:
+        format_values = (format_values,)
+    window[key].update(text_format.format(*format_values))
