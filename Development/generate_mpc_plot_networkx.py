@@ -102,6 +102,22 @@ class TopologyIterationData:
         init_failures = len(self.get_initial_failures()[iteration_index])
         return init_failures + later_failures - 1
 
+    def get_max_failed_lines(self) -> int:
+        return self.get_total_failures_at_iteration(self.get_iteration_index_with_most_failures())
+
+    def get_avg_failed_lines(self) -> float:
+        sum_failures = sum(self.get_total_failures_at_iteration(i)
+                           for i in range(self.get_num_iterations()))
+        return sum_failures / self.get_num_iterations()
+
+    def get_max_accumulated_failed_line_capacity(self) -> float:
+        return max(self.state_matrix['Accumulation of Failed Capacities'])
+
+    def get_average_accumulated_failed_line_capacity(self) -> float:
+        sum_final_accumulated_failed_line_capacity = sum(
+            self.state_matrix['Accumulation of Failed Capacities'][i] for i in self.sim_end_indices)
+        return sum_final_accumulated_failed_line_capacity / self.get_num_iterations()
+
 
 def load_mpc(path: str):
     mpc_matrix = scipy.io.loadmat(MPC_PATH)
@@ -162,7 +178,8 @@ def get_failure_array_at_iteration(initial_failures, state_matrix, line_failed_n
     state_matrix = get_single_simulation_state_matrix(
         state_matrix, line_failed_negative_one_indices, simulation_index)
     # initial_failures = initial_failures[simulation_index]
-    failures = initial_failures[simulation_index] + state_matrix['Failed Line Index'][1:iteration_index + 1].tolist()
+    failures = initial_failures[simulation_index] + \
+        state_matrix['Failed Line Index'][1:iteration_index + 1].tolist()
     return failures
 
 

@@ -1,4 +1,5 @@
-
+#
+# File for constant text, such as UI text, labels, and keys for UI elements
 
 TITLE_ABOUT_INPUTS_POPUP = 'Simulator Inputs'
 TEXT_ABOUT_INPUTS_POPUP = (
@@ -26,3 +27,14 @@ FORMAT_TEXT_TOP_LABEL = 'Results for %d iterations, %d initial failures, %.2f lo
 FORMAT_TEXT_SELECTED_SIM = 'Simulation %d out of %d'
 FORMAT_TEXT_SIM_STEP = 'Step %d of %d'
 FORMAT_TEXT_SIM_STATUS = '%s'
+
+KEY_TEXT_OUTPUT_AVG_FAILED_LINES = 'avg_failed_lines'
+FORMAT_TEXT_OUTPUT_AVG_FAILED_LINES = '%.2f'
+KEY_TEXT_OUTPUT_MAX_FAILED_LINES = 'max_failed_lines'
+FORMAT_TEXT_OUTPUT_MAX_FAILED_LINES = '%.2f'
+KEY_TEXT_OUTPUT_AVG_ACC_FAILED_CAPACITY = 'avg_acc_failed_capacity'
+FORMAT_TEXT_OUTPUT_AVG_ACC_FAILED_CAPACITY = '%.2f'
+KEY_TEXT_OUTPUT_MAX_ACC_FAILED_CAPACITY = 'max_acc_failed_capacity'
+FORMAT_TEXT_OUTPUT_MAX_ACC_FAILED_CAPACITY = '%.2f'
+
+# Simulation status messages
