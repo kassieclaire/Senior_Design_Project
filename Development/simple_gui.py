@@ -82,28 +82,6 @@ KEY_TEXT_SELECTED_SIM = 'sim_text'
 KEY_TEXT_SIM_STEP = 'step_text'
 KEY_TEXT_SIM_STATUS = 'sim_status'
 
-# descriptions and tooltips
-description = " This is a Graphical User Interface \n for the SACE lab's cascading failure simulator, \n which simulates line failures in a grid \n after a number of initial failures"
-# Tooltips
-tooltip_iterations = "The number of iterations to run the simulation for. \n" + \
-    "Higher numbers of iterations will take longer, but will produce more reliable results."
-load_tooltip = "This is the load-generation ratio for the grid. \n" + \
-    "The load-generation ratio is the load on the grid as a percentage of its rated capacity. \n" + \
-    "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
-    "and 0.0 represents no load"
-operator_constraints_tooltip = "This represents the constraints to which grid operators are held when making load-shedding decisions. \n" + \
-    "Load-shedding is when a grid operator reduces or turns off electricity distribution to an area when the demand is larger than a power source can supply. \n" + \
-    "0.0 represents no load-shedding constraints, while 1.0 represents no load-shedding allowed"
-error_tooltip = "This represents the estimation error operators have when determining the highest capacity of a line. \n" + \
-    "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
-initial_failures_tooltip = "This is the number of random line failures that occur at the start of the simulation."
-
-# Temporarily defined values TODO: Actually calculate these per run!
-cap_loss = 1500
-delivery_loss_percent = 8
-worst_cluster = 4
-num_lines = 186
-
 
 class FigureState(enum.Enum):
     PSTOP = 1
@@ -144,20 +122,20 @@ def simple_gui(debug=False):
     # columns
     input_column = [  # [sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
         [sg.Text('Simulation Inputs')],
-        [sg.Frame('Iterations', [[sg.Input(key=KEY_INPUT_BOX_ITERATIONS, tooltip=tooltip_iterations,
+        [sg.Frame('Iterations', [[sg.Input(key=KEY_INPUT_BOX_ITERATIONS, tooltip=ui_text.TOOLTIP_INITIAL_FAILURES,
                                            size=SIZE_INPUT_BOX, default_text=str(DEFAULT_INPUT_BOX_ITERATIONS))]], border_width=10, relief='flat')],
         [sg.HorizontalSeparator()],
         [gui_utilities.make_slider_with_frame(
-            label='Load', key=KEY_SLIDER_LOAD, tooltip=load_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD)],
+            label='Load', key=KEY_SLIDER_LOAD, tooltip=ui_text.TOOLTIP_LOAD, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD)],
         [sg.HorizontalSeparator()],
         [gui_utilities.make_slider_with_frame(
-            label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=initial_failures_tooltip, range=(0, 50), resolution=1, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_INITIAL_FAILURES)],
+            label='Initial Line Failures', key=KEY_SLIDER_INITIAL_FAILURES, tooltip=ui_text.TOOLTIP_INITIAL_FAILURES, range=(0, 50), resolution=1, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_INITIAL_FAILURES)],
         [sg.HorizontalSeparator()],
         [gui_utilities.make_slider_with_frame(
-            label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=operator_constraints_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD_SHED_CONST)],
+            label='Operator Constraints', key=KEY_SLIDER_LOAD_SHED_CONST, tooltip=ui_text.TOOLTIP_LOAD_SHED_CONSTANT, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_LOAD_SHED_CONST)],
         [sg.HorizontalSeparator()],
         [gui_utilities.make_slider_with_frame(
-            label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=error_tooltip, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
+            label='Line Capacity Uncertainty', key=KEY_SLIDER_CAPACITY_ESTIMATION_ERROR, tooltip=ui_text.TOOLTIP_ERROR, range=(0.0, 1.0), resolution=0.05, size=SIZE_SLIDER, default_value=DEFAULT_SLIDER_CAPACITY_ESTIMATION_ERROR)],
         [sg.Button(TEXT_BUTTON_SIM_RUN, key=KEY_BUTTON_SIM_RUN, button_color=(
             TEXT_COLOR, BACKGROUND_COLOR)),
          sg.Button(TEXT_BUTTON_SIM_CANCEL, key=KEY_BUTTON_SIM_CANCEL, button_color=(TEXT_COLOR, BACKGROUND_COLOR), disabled=True)],
