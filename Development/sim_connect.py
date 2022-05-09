@@ -143,38 +143,31 @@ class Simulation:
         argString = " ".join(self.__get_argument_array())
         process = None
         # argString = f"{self.case_name} {self.iterations} {self.initial_failures} {self.load_generation_ratio} {self.load_shed_constant} {self.estimation_error} {self.output_name} {self.batch_size}"
+
+        # call windows executable if platform is windows
         if sys.platform == "win32":
             # TODO add a warning if the runtime is not installed
             print(argString)
-            # TODO run the simulation as a subprocess
-            #subprocess.run([windows_executable, arguments])
-            # os.system(f"{windows_executable} {argString}")
             process = subprocess.Popen(
                 [windows_executable] + self.__get_argument_array(), stdout=subprocess.PIPE)
 
+        # call linux executable if platform is linux
         elif sys.platform == "linux" or sys.platform == "linux2":
             # TODO add a warning if the runtime is not installed
             print("Work on Linux platform still in progress.")
-            # if output_name is None:
-            #     output_name = get_output_name(
-            #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
-            # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
             print(argString)
             process = subprocess.Popen(
                 [linux_executable, linux_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
-            # return output_name
+
+        # call mac executable if platform is mac
         elif sys.platform == "darwin":
+            # TODO add a warning if the runtime is not installed
             print("Work on Mac platform is still in progress")
-            # if output_name is None:
-            #     output_name = get_output_name(
-            #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
-            # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
-            # print(argString)
-            # create a simulator process and run it and get the log
+            print(argString)
             process = subprocess.Popen(
                 [mac_executable, mac_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
-            # return output_name
-            # return 0
+
+        # if the platform is not supported, raise an error
         else:
             print("Unknown platform: ", sys.platform)
             return
