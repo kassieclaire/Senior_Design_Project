@@ -19,7 +19,9 @@ SEED = 42
 
 
 class TopologyIterationData:
-    def __init__(self, state_matrix, initial_failures, mpc_path):
+    def __init__(self, state_matrix, initial_failures, mpc_path=None, case_name=None):
+        if mpc_path is None:
+            mpc_path = f'{case_name}_mpc_presim.mat'
         mpc = load_mpc(mpc_path)
         self.branch_dataframe = get_branch_dataframe(mpc)
         self.state_matrix = state_matrix
@@ -84,6 +86,37 @@ class TopologyIterationData:
         """
         _, _, steps = self.get_iteration_start_end_steps(interation_index)
         return steps
+
+    def get_num_iterations(self) -> int:
+        return len(self.sim_end_indices)
+
+    def get_state_matrix(self) -> pd.DataFrame:
+        return self.state_matrix
+
+    def get_initial_failures(self) -> 'list[list[int]]':
+        return self.initial_failures
+
+    def get_total_failures_at_iteration(self, iteration_index) -> int:
+        _, _, later_failures = self.get_iteration_start_end_steps(
+            iteration_index)
+        init_failures = len(self.get_initial_failures()[iteration_index])
+        return init_failures + later_failures - 1
+
+    def get_max_failed_lines(self) -> int:
+        return self.get_total_failures_at_iteration(self.get_iteration_index_with_most_failures())
+
+    def get_avg_failed_lines(self) -> float:
+        sum_failures = sum(self.get_total_failures_at_iteration(i)
+                           for i in range(self.get_num_iterations()))
+        return sum_failures / self.get_num_iterations()
+
+    def get_max_accumulated_failed_line_capacity(self) -> float:
+        return max(self.state_matrix['Accumulation of Failed Capacities'])
+
+    def get_average_accumulated_failed_line_capacity(self) -> float:
+        sum_final_accumulated_failed_line_capacity = sum(
+            self.state_matrix['Accumulation of Failed Capacities'][i] for i in self.sim_end_indices)
+        return sum_final_accumulated_failed_line_capacity / self.get_num_iterations()
 
 
 def load_mpc(path: str):
@@ -187,6 +220,8 @@ def plot_network(mpc_branch_dataframe, initial_failures, state_matrix, simulatio
             g, pos=nx.get_node_attributes(g, 'pos'), ax=axes, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
+
+
 def plot_network_update(mpc_branch_dataframe, initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index, bus_labels: bool = True, branch_labels: bool = False, axes=None, fig=None):
     failure_indix_arr = get_failure_array_at_iteration(
         initial_failures, state_matrix, simulation_end_index_array, simulation_index, iteration_index)
@@ -210,6 +245,7 @@ def plot_network_update(mpc_branch_dataframe, initial_failures, state_matrix, si
             g, ax=axes, pos=pos, edge_labels=edge_labels, font_size=6, rotate=False)
     # plt.show()
     return fig
+
 
 def increment_if_result_in_range(val: Num, increment_val: Num, rng: range) -> Num:
     return val + increment_val if val + increment_val in rng else val

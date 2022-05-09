@@ -40,9 +40,11 @@ description = " This is a Graphical User Interface \n for the SACE lab's cascadi
 tooltip_iterations = "The number of iterations to run the simulation for. \n" + \
     "Higher numbers of iterations will take longer, but will produce more reliable results."
 load_tooltip = "This is the load-generation ratio for the grid. \n" + \
+    "The load-generation ratio is the load on the grid as a percentage of its rated capacity. \n" + \
     "1.0 represents the sum of the loads being equivalant to the max generation capacity\n" + \
     "and 0.0 represents no load"
 operator_constraints_tooltip = "This represents the constraints to which grid operators are held when making load-shedding decisions. \n" + \
+    "Load-shedding is when a grid operator reduces or turns off electricity distribution to an area when the demand is larger than a power source can supply. \n" + \
     "0.0 represents no load-shedding constraints, while 1.0 represents no load-shedding allowed"
 error_tooltip = "This represents the estimation error operators have when determining the highest capacity of a line. \n" + \
     "0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities"
@@ -60,14 +62,15 @@ def complex_gui(debug=False):
     # set the style of the plot
     # plt.style.use('ieee')
     # set the plot dpi to 300
-    matplotlib.rcParams['figure.dpi'] = 200
+    #matplotlib.rcParams['figure.dpi'] = 200
     # set the plot size to be square
-    matplotlib.rcParams['figure.figsize'] = (3, 2.5)
+    #matplotlib.rcParams['figure.figsize'] = (3, 2.5)
     matplotlib.use('TkAgg')
     sg.theme('LightGrey1')
 
     menu_def = [
-        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']]]
+        ['&File', ['&Save Figure', '&Save Simple DF', '&Save States.mat', '&Save DF']],
+        ['&About', ['&Inputs', '&Outputs', '&Software']]]
 
     # columns
     input_column = [[sg.Frame('Cascading Failure Simulation', [[sg.Text(description)]], border_width=10)],
@@ -188,6 +191,29 @@ def complex_gui(debug=False):
             if file != '':
                 target = file
                 shutil.copyfile(original, target)
+        elif event == 'Inputs':
+            # explains the input options
+            sg.popup(
+                'ITERATIONS: The number of iterations to run the simulation for. Higher numbers of iterations' +
+                'will take longer, but will produce more reliable results.',
+                'LOAD: This is the load-generation ratio for the grid. The load-generation ratio is the load on ' +
+                'the grid as a percentage of its rated capacity. 1.0 represents the sum of the loads being equivalant' +
+                'to the max generation capacity and 0.0 represents no load',
+                'OPERATOR CONSTRAINTS: This represents the constraints to which grid operators are held when making load-shedding decisions.' +
+                'Load-shedding is when a grid operator reduces or turns off electricity distribution to an area when the' +
+                'demand is larger than a power source can supply. 0.0 represents no load-shedding constraints, while' +
+                '1.0 represents no load-shedding allowed',
+                'ERROR: This represents the estimation error operators have when determining the highest capacity of a line.' +
+                '0.0 represents perfect knowledge of line capacities, 1.0 represents minimum knowledge of line capacities',
+                'INITIAL FAILURES: This is the number of random line failures that occur at the start of the simulation.')
+
+        elif event == 'Outputs':
+            # explains the outputs and what they mean
+            sg.popup('explain the outputs and why they are significant')
+
+        elif event == 'Software':
+            # explains the importance of the software
+            sg.popup('explains history of software and why it is important')
 
 
         # TODO add a proper event for windows closed (event == WIN_CLOSED)?

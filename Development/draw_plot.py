@@ -30,11 +30,36 @@ def draw_plot():
     plt.legend()
     # set title
     plt.title = "Cascade-Stop Probability vs Number of Line Failures"
-    #plt.plot([0.1, 0.2, 0.5, 0.7])
+    # plt.plot([0.1, 0.2, 0.5, 0.7])
     # plt.show(block=False)
     return fig
 
 # draw a more plot using inputs
+
+
+def draw_pstop_curve(fig, state_matrix_dataframe):
+    if fig is None:
+        fig = plt.figure()
+    else:
+        fig = plt.figure(fig.number)
+    # generate the df using pstop_generic
+    p_stop_df = generate_generic_pStop(states_df=state_matrix_dataframe)
+    # generate the graph
+    # fig = plt.figure()
+    # ax = plt.axes()
+    plt.plot('x_values', 'cascade_stop', data=p_stop_df,
+             color='skyblue', linewidth=1)
+    plt.xlabel('Number of Failed Lines')
+    plt.ylabel('Cascade-Stop Probability')
+    plt.title('Cascade-Stop Probability vs Number of Line Failures')
+    # show legend
+    # plt.legend()
+    # set title
+    # plt.title = "Cascade-Stop Probability vs Number of Line Failures"
+    plt.autoscale()
+    # plt.plot([0.1, 0.2, 0.5, 0.7])
+    # plt.show(block=False)
+    return fig
 
 
 def run_button_action(fig, case_name, iterations, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, batch_size):
@@ -58,7 +83,7 @@ def run_button_action(fig, case_name, iterations, initial_failures, load_generat
     # generate the df using pstop_generic
     p_stop_df = generate_generic_pStop(states_df=states_df)
     # generate the graph
-    #fig = plt.figure()
+    # fig = plt.figure()
     plt.plot('x_values', 'cascade_stop', data=p_stop_df,
              color='skyblue', linewidth=5)
     plt.xlabel('Number of Failed Lines')
@@ -69,7 +94,7 @@ def run_button_action(fig, case_name, iterations, initial_failures, load_generat
     # set title
     plt.title = "Cascade-Stop Probability vs Number of Line Failures"
     plt.autoscale()
-    #plt.plot([0.1, 0.2, 0.5, 0.7])
+    # plt.plot([0.1, 0.2, 0.5, 0.7])
     # plt.show(block=False)
     return fig
 
@@ -113,6 +138,6 @@ def simple_run_button_action(fig, case_name, iterations, initial_failures, load_
         graph_data.get_iteration_index_with_most_failures(), 0, fig)
     # fig = generate_mpc_plot_networkx.plot_network_update(branch_data, initial_failures, states_df,
     #                                                      negativeOneIndices, mostFailureSimIndex, simIteration, True, False, fig=fig)
-    #plt.plot([0.1, 0.2, 0.5, 0.7])
+    # plt.plot([0.1, 0.2, 0.5, 0.7])
     # plt.show(block=False)
     return graph_data, fig
