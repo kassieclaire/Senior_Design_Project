@@ -17,7 +17,8 @@ from organize_simulation import *
 windows_executable = ".\\sim_executable\\cascading_failure_simulator.exe"
 mac_executable = "./sim_executable_mac/run_cascading_failure_simulator.sh"
 mac_matlab_loc = "/Applications/MATLAB_R2021b.app"
-linux_executable = "./sim_executable_linux/run_cascading_failure_simulator.sh /usr/local/MATLAB/MATLAB_Runtime/v911/"
+linux_executable = "./sim_executable_linux/run_cascading_failure_simulator.sh"
+linux_matlab_loc = "/usr/local/MATLAB/MATLAB_Runtime/v911/"
 # simulations to run and their settings
 # batch_sizes = [64, 64]
 # case_names = ["case118", "case118"]
@@ -159,7 +160,8 @@ class Simulation:
             #         case_name, initial_failures, load_generation_ratio, load_shed_constant, estimation_error, iterations)
             # argString = f"{case_name} {iterations} {initial_failures} {load_generation_ratio} {load_shed_constant} {estimation_error} {output_name} {batch_size}"
             print(argString)
-            os.system(f"{linux_executable} {argString}")
+            process = subprocess.Popen(
+                [linux_executable, linux_matlab_loc] + self.__get_argument_array(), stdout=subprocess.PIPE)
             # return output_name
         elif sys.platform == "darwin":
             print("Work on Mac platform is still in progress")
