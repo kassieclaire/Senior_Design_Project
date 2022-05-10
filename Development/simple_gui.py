@@ -184,21 +184,25 @@ def simple_gui(debug=False):
     # fig = draw_plot()
 
     # load mpc plotting data
-    state_matrix = load_sim_data.load_state_matrix(PATH_SIM_STATE_MATRIX)
-    initial_failures = load_sim_data.load_initial_failures(
-        PATH_SIM_INITIAL_FAILURES)
-    graph_data = generate_mpc_plot_networkx.TopologyIterationData(
-        state_matrix, initial_failures, MPC_PATH)
+    # state_matrix = load_sim_data.load_state_matrix(PATH_SIM_STATE_MATRIX)
+    initial_failures = 0
+    # initial_failures = load_sim_data.load_initial_failures(
+    # PATH_SIM_INITIAL_FAILURES)
+    # graph_data=generate_mpc_plot_networkx.TopologyIterationData(
+    #     state_matrix, initial_failures, MPC_PATH)
     # branch_data = generate_mpc_plot_networkx.get_branch_dataframe(
     #     generate_mpc_plot_networkx.load_mpc(MPC_PATH))
     # negativeOneIndices = generate_mpc_plot_networkx.get_statematrix_steady_state_negative_one_indices(
     #     state_matrix)
     # mostFailureSimIndex = generate_mpc_plot_networkx.get_sim_index_with_most_failures(
     #     negativeOneIndices)
-    iteration_index = graph_data.get_iteration_index_with_most_failures()
-    num_steps = graph_data.get_num_steps(
-        iteration_index)
-    num_iterations = graph_data.get_num_iterations()
+    iteration_index = 0
+    num_steps = 0
+    num_iterations = 0
+    # iteration_index = graph_data.get_iteration_index_with_most_failures()
+    # num_steps = graph_data.get_num_steps(
+    #     iteration_index)
+    # num_iterations = graph_data.get_num_iterations()
     simulation_obj: sim_connect.Simulation = None
 
     simStep = 0
