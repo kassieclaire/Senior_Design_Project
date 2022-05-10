@@ -220,11 +220,12 @@ def simple_gui(debug=False):
     gui_utilities.update_text(window, KEY_TEXT_SIM_STEP,
                               ui_text.FORMAT_TEXT_SIM_STEP, (simStep, num_steps - 1))
 
+    graph_data = None
     # TODO change this hardcoded value
-    simulation_select.display_iterations(
-        window, graph_data, 0, 3000)
-    gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
-                              ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations, graph_data.get_total_failures_at_iteration(iteration_index)))
+    # simulation_select.display_iterations(
+    #     window, graph_data, 0, 3000)
+    # gui_utilities.update_text(window, KEY_TEXT_SELECTED_SIM,
+    #                           ui_text.FORMAT_TEXT_SELECTED_SIM, (iteration_index, num_iterations, graph_data.get_total_failures_at_iteration(iteration_index)))
 
     # run loop
     event = ''
